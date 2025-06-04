@@ -3,6 +3,10 @@
 
 // ゲームシーン
 class GameScene {
+private:
+	// テクスチャハンドル
+	uint32_t textureHandle_ = 0;
+
 public:
 	// 初期化
 	void Initialize();
