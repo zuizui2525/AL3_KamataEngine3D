@@ -6,8 +6,14 @@ class GameScene {
 private:
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0;
+	// 3Dモデル
+	KamataEngine::Model* model_ = nullptr;
+	// カメラ
+	KamataEngine::Camera camera_;
 
 public:
+	// デストラクタ
+	~GameScene();
 	// 初期化
 	void Initialize();
 	// 更新
