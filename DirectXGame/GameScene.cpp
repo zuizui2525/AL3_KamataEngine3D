@@ -55,7 +55,7 @@ void GameScene::Draw() {
 	// スプライト描画前描画
 	Sprite::PreDraw(dxCommon->GetCommandList());
 	// スプライト描画
-	//sprite_->Draw();
+	sprite_->Draw();
 	// スプライト描画後描画
 	Sprite::PostDraw();
 
