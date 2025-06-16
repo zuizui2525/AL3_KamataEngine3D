@@ -13,7 +13,7 @@ private:
 	// 3Dモデル
 	Model* model_ = nullptr;
 	// カメラ
-	Camera* camera_ = nullptr;
+	Camera camera_;
 	// 自キャラ
 	Player* player_ = nullptr;
 
@@ -26,4 +26,4 @@ public:
 	void Update();
 	// 描画
 	void Draw();
-}
+};

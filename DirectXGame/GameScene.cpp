@@ -17,14 +17,12 @@ void GameScene::Initialize() {
 	textureHandle_ = TextureManager::Load("uvChecker.png");
 	// 3Dモデルの生成
 	model_ = Model::Create();
-	// カメラの生成
-	camera_ = new Camera();
 	// カメラの初期化
-	camera_->Initialize();
+	camera_.Initialize();
 	// 自キャラの生成
 	player_ = new Player();
 	// 自キャラの初期化
-	player_->Initialize(model_, textureHandle_, camera_);
+	player_->Initialize(model_, textureHandle_, &camera_);
 }
 
 // ゲームの更新処理

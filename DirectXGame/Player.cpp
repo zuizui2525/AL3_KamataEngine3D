@@ -1,16 +1,17 @@
 #include "Player.h"
 
+// DirectXCommonインスタンスの取得
+DirectXCommon* dxCommon = DirectXCommon::GetInstance();
+
 void Player::Initialize(Model* model, uint32_t textureHandle, Camera* camera) {
 	// NULLポインタチェック
 	assert(model);
+	assert(textureHandle != 0);
+	assert(camera);
 	// データをモデルに代入
 	model_ = model;
-	// NULLポインタチェック
-	assert(textureHandle != 0);
 	// データをテクスチャハンドルに代入
 	textureHandle_ = textureHandle;
-	// NULLポインタチェック
-	assert(camera);
 	// データをカメラに代入
 	camera_ = camera;
 	// ワールド変数の初期化
@@ -22,7 +23,9 @@ void Player::Update() {
 	worldTransform_.TransferMatrix();
 }
 
-void Player::Draw() {  
-	// 3Dモデルの描画 
-	model_->Draw(worldTransform_, camera_, textureHandle_);
+void Player::Draw() {
+	// 3Dモデルの描画
+	model_->PreDraw(dxCommon->GetCommandList());
+	model_->Draw(worldTransform_, *camera_, textureHandle_);
+	model_->PostDraw();
 }
