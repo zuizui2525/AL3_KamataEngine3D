@@ -5,7 +5,8 @@ using namespace KamataEngine;
 
 // 初期化処理
 void GameScene::Initialize() {
-	
+	// 3Dモデルの生成
+	modelBlock_ = Model::Create();
 }
 
 // ゲームの更新処理

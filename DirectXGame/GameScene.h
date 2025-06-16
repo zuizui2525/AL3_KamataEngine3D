@@ -3,6 +3,10 @@
 
 //ゲームシーン
 class GameScene {
+private:
+	// 3Dモデル
+	KamataEngine::Model* modelBlock_;
+
 public:
 	//初期化
 	void Initialize();
