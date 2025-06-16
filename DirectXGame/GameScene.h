@@ -4,6 +4,8 @@
 //ゲームシーン
 class GameScene {
 private:
+	// テクスチャハンドル
+	uint32_t textureHandle_ = 0;
 	// 3Dモデル
 	KamataEngine::Model* modelBlock_;
 
