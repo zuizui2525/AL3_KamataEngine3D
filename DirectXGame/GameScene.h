@@ -1,5 +1,9 @@
 #pragma once
 #include "KamataEngine.h"
+#include "Player.h"
+
+// KamataEngineの名前空間を使用
+using namespace KamataEngine;
 
 // ゲームシーン
 class GameScene {
@@ -7,9 +11,11 @@ private:
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0;
 	// 3Dモデル
-	KamataEngine::Model* model_ = nullptr;
+	Model* model_ = nullptr;
 	// カメラ
-	KamataEngine::Camera camera_;
+	Camera* camera_ = nullptr;
+	// 自キャラ
+	Player* player_ = nullptr;
 
 public:
 	// デストラクタ
@@ -20,4 +26,4 @@ public:
 	void Update();
 	// 描画
 	void Draw();
-};
+}
