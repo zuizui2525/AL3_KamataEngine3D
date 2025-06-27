@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include "Function.h"
 
 // KamataEngineの名前空間を使用
 using namespace KamataEngine;
@@ -17,7 +18,7 @@ GameScene::~GameScene() {
 // 初期化処理
 void GameScene::Initialize() {
 	// ファイル名を指定してテクスチャハンドルを読み込む
-	textureHandle_ = TextureManager::Load("Resources/cube/cube.jpg");
+	textureHandle_ = TextureManager::Load("./Resources/cube/cube.jpg");
 	// 3Dモデルの生成
 	modelBlock_ = Model::Create();
 	// 要素数
@@ -39,11 +40,19 @@ void GameScene::Initialize() {
 }
 
 // ゲームの更新処理
-void GameScene::Update() {
-	
+void GameScene::Update() { 
+	for (WorldTransform* worldTransformBlock : worldTransformBlocks_) {
+		// アフィン変換行列の作成
+		worldTransformBlock->matWorld_ = MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
+		// 定数バッファに転送する
+		worldTransformBlock->TransferMatrix();
+	}
 }
 
 // 描画処理
 void GameScene::Draw() {
-
+	// ブロックの描画
+	for (WorldTransform* worldTransformBlock : worldTransformBlocks_) {
+		modelBlock_->Draw(*worldTransformBlock, camera_);
+	}
 }
