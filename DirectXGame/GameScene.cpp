@@ -8,6 +8,8 @@ using namespace KamataEngine;
 GameScene::~GameScene() {
 	// 3Dモデルの解放
 	delete modelBlock_;
+	delete modelSkydome_;
+	delete skydome_;
 	// デバックカメラの解放
 	delete debugCamera_;
 	// ブロック用のワールドトランスフォームの解放
@@ -23,12 +25,16 @@ GameScene::~GameScene() {
 void GameScene::Initialize() {
 	// ファイル名を指定してテクスチャハンドルを読み込む
 	textureHandle_ = TextureManager::Load("./Resources/cube/cube.jpg");
-	// 3Dモデルの生成
-	modelBlock_ = Model::Create();
 	// カメラの初期化
 	camera_.Initialize();
 	// デバックカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
+	// 3Dモデルの生成
+	modelBlock_ = Model::Create();
+	// 天球の初期化
+	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
+	skydome_ = new Skydome();
+	skydome_->Initialize(modelSkydome_, &camera_);
 	// 要素数
 	const uint32_t kNumBlockHorizontal = 20; // 横方向のブロック数
 	const uint32_t kNumBlockVertical = 20;   // 縦方向のブロック数
@@ -93,19 +99,30 @@ void GameScene::Update() {
 			worldTransformBlock->TransferMatrix();
 		}
 	}
+	// 天球
+	skydome_->Update();
 }
 
 // 描画処理
 void GameScene::Draw() {
+	// モデル前処理
+	Model::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
+	
+	// 天球の描画
+	skydome_->Draw();
+
 	// ブロックの描画
 	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
 			if (!worldTransformBlock) {
 				continue;
 			}
-			modelBlock_->PreDraw(DirectXCommon::GetInstance()->GetCommandList());
+
+			// モデルの描画
 			modelBlock_->Draw(*worldTransformBlock, camera_);
-			modelBlock_->PostDraw();
 		}
 	}
+
+	// モデル後処理
+	modelBlock_->PostDraw();
 }
