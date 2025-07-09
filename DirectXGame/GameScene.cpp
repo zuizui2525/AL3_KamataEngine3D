@@ -4,8 +4,7 @@
 using namespace KamataEngine;
 
 // 初期化処理
-void GameScene::Initialize() {}
-
+void GameScene::Initialize() {
 	// ファイル名を指定してテクスチャを読み込む
 	textureHandle_ = TextureManager::Load("uvChecker.png");
 	// サウンドデータハンドル
@@ -41,7 +40,7 @@ void GameScene::Update() {
 	sprite_->SetPosition(position);
 	// スペースキーを押した瞬間
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		//音声停止
+		// 音声停止
 		Audio::GetInstance()->StopWave(voiceHandle_);
 	}
 	// デバックカメラの更新
@@ -72,7 +71,7 @@ void GameScene::Draw() {
 GameScene::GameScene() {}
 
 // デストラクタ
-GameScene::~GameScene() { 
+GameScene::~GameScene() {
 	// スプライトの解放処理
 	delete sprite_;
 	// モデルの解放処理
