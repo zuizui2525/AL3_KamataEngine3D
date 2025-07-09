@@ -8,15 +8,20 @@
 /// </summary>
 class Skydome {
 private:
-	// ワールド変換データ
-	std::shared_ptr<KamataEngine::WorldTransform> worldTransform_;
+	// テクスチャハンドル
+	uint32_t textureHandle_ = 0;
 	// モデル
-	std::shared_ptr<KamataEngine::Model> model_ = nullptr;
+	KamataEngine::Model* model_ = nullptr;
+	// カメラ
+	KamataEngine::Camera* camera_ = nullptr;
+	// ワールド変換データ
+	KamataEngine::WorldTransform worldTransform_;
+
 public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize();
+	void Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera);
 
 	/// <summary>
 	/// 更新
