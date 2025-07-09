@@ -5,7 +5,7 @@
 class GameScene {  
 private:  
 	// DirectX共通クラスへのポインタ
-	KamataEngine::DirectXCommon* dxCommon = nullptr;  
+	KamataEngine::DirectXCommon* dxCommon_ = nullptr;  
 	// テクスチャハンドル  
 	uint32_t textureHandle_ = 0;
 	// サウンドデータハンドル

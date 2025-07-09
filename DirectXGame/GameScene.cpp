@@ -5,6 +5,8 @@ using namespace KamataEngine;
 
 // 初期化処理
 void GameScene::Initialize() {
+	//DirectXCommonインスタンスの取得
+	dxCommon_ = DirectXCommon::GetInstance();
 	// ファイル名を指定してテクスチャを読み込む
 	textureHandle_ = TextureManager::Load("uvChecker.png");
 	// サウンドデータハンドル
@@ -50,14 +52,14 @@ void GameScene::Update() {
 // 描画処理
 void GameScene::Draw() {
 	// スプライト描画前描画
-	Sprite::PreDraw(dxCommon->GetCommandList());
+	Sprite::PreDraw(dxCommon_->GetCommandList());
 	// スプライト描画
 	sprite_->Draw();
 	// スプライト描画後描画
 	Sprite::PostDraw();
 
 	// 3Dモデル描画前描画
-	Model::PreDraw(dxCommon->GetCommandList());
+	Model::PreDraw(dxCommon_->GetCommandList());
 	// 3Dモデル描画
 	model_->Draw(worldTransform_, debugCamera_->GetCamera(), textureHandle_);
 	// 3Dモデル描画後描画
