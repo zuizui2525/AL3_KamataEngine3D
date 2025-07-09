@@ -1,29 +1,30 @@
-#pragma once
-#include "KamataEngine.h"
-#include "Player.h"
+#pragma once  
+#include <vector>  
+#include "KamataEngine.h"  
 
-// KamataEngineの名前空間を使用
-using namespace KamataEngine;
-
-// ゲームシーン
-class GameScene {
-private:
-	// テクスチャハンドル
-	uint32_t textureHandle_ = 0;
-	// 3Dモデル
-	Model* model_ = nullptr;
+// ゲームシーン  
+class GameScene {  
+private:  
+	// テクスチャハンドル  
+	uint32_t textureHandle_ = 0;  
+	// 3Dモデル  
+	KamataEngine::Model* modelBlock_;
 	// カメラ
-	Camera camera_;
-	// 自キャラ
-	Player* player_ = nullptr;
+	KamataEngine::Camera camera_;
+	// デバックカメラ
+	KamataEngine::DebugCamera* debugCamera_ = nullptr;
+	// デバックカメラ有効
+	bool isDebugCameraActive_ = false;
+	// ブロック用のワールドトランスフォーム 
+	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;  
 
-public:
-	// デストラクタ
-	~GameScene();
-	// 初期化
-	void Initialize();
-	// 更新
-	void Update();
-	// 描画
-	void Draw();
+public:  
+	// デストラクタ  
+	~GameScene();  
+	// 初期化  
+	void Initialize();  
+	// 更新  
+	void Update();  
+	// 描画  
+	void Draw();  
 };
