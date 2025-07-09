@@ -12,6 +12,8 @@ GameScene::~GameScene() {
 	delete skydome_;
 	// デバックカメラの解放
 	delete debugCamera_;
+	// マップチップフィールドの解放
+	delete mapChipField_;
 	// ブロック用のワールドトランスフォームの解放
 	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
@@ -35,34 +37,10 @@ void GameScene::Initialize() {
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 	skydome_ = new Skydome();
 	skydome_->Initialize(modelSkydome_, &camera_);
-	// 要素数
-	const uint32_t kNumBlockHorizontal = 20; // 横方向のブロック数
-	const uint32_t kNumBlockVertical = 20;   // 縦方向のブロック数
-	// ブロック1個分の横幅
-	const float kBlockWidth = 2.0f;  // 1ブロックの幅
-	const float kBlockHeight = 2.0f; // 1ブロックの高さ
-	// 要素数を変更する
-	worldTransformBlocks_.resize(kNumBlockVertical);
-	for (uint32_t i = 0; i < kNumBlockVertical; ++i) {
-		worldTransformBlocks_[i].resize(kNumBlockHorizontal);
-	}
-	// キューブの生成
-	for (uint32_t i = 0; i < kNumBlockVertical; ++i) {
-		for (uint32_t j = 0; j < kNumBlockHorizontal; ++j) {
-			// ワールドトランスフォームの生成
-			if ((i + j) % 2 == 0) {
-				worldTransformBlocks_[i][j] = new WorldTransform();
-			} else {
-				worldTransformBlocks_[i][j] = nullptr;
-				continue;
-			}
-			// ワールドトランスフォームの初期化
-			worldTransformBlocks_[i][j]->Initialize();
-			// ワールドトランスフォームの位置を設定
-			worldTransformBlocks_[i][j]->translation_.x = kBlockWidth * j;
-			worldTransformBlocks_[i][j]->translation_.y = kBlockHeight * i;
-		}
-	}
+	// マップチップフィールド
+	mapChipField_ = new MapChipField;
+	mapChipField_->LoadMapChipCsv("Resources/mapChipData/mapChip.csv");
+	GenerateBlocks();
 }
 
 // ゲームの更新処理
@@ -125,4 +103,28 @@ void GameScene::Draw() {
 
 	// モデル後処理
 	modelBlock_->PostDraw();
+}
+
+void GameScene::GenerateBlocks() { 
+	uint32_t numBlockVirtical = mapChipField_->GetNumBlockVirtical();
+	uint32_t numBlockHorizontal = mapChipField_->GetNumBlockHorizontal();
+
+	// 要素数を変更する
+	// 列数を設定（縦方向のブロック数）
+	worldTransformBlocks_.resize(numBlockVirtical);
+	for (uint32_t i = 0; i < numBlockVirtical; ++i) {
+		// 1列の要素数を設定（横方向のブロック数）
+		worldTransformBlocks_[i].resize(numBlockHorizontal);
+	}
+
+	for (uint32_t i = 0; i < numBlockVirtical; ++i) {
+		for (uint32_t j = 0; j < numBlockHorizontal; ++j) {
+			if (mapChipField_->GetMapChipTypeByIndex(j, i) == MapChipType::kBlock) {
+				WorldTransform* worldTransform = new WorldTransform();
+				worldTransform->Initialize();
+				worldTransformBlocks_[i][j] = worldTransform;
+				worldTransformBlocks_[i][j]->translation_ = mapChipField_->GetMapChipPositionByIndex(j, i);
+			}
+		}
+	}
 }
