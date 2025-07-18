@@ -1,44 +1,38 @@
-﻿#include <cmath>
-#include <assert.h>
 #include "Function.h"
+#include <assert.h>
+#include <cmath>
 
+// KamataEngineの名前空間を使用
+using namespace KamataEngine;
+
+#pragma region Vector3
 // ベクトルの加算を計算する関数
-Vector3 Add(const Vector3& v1, const Vector3& v2) {
-	return { v1.x + v2.x, v1.y + v2.y, v1.z + v2.z };
-}
+Vector3 Add(const Vector3& v1, const Vector3& v2) { return {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}; }
 
 // ベクトルの引き算を計算する関数
-Vector3 Subtract(const Vector3& v1, const Vector3& v2) {
-	return { v1.x - v2.x, v1.y - v2.y, v1.z - v2.z };
-}
+Vector3 Subtract(const Vector3& v1, const Vector3& v2) { return {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}; }
 
 // ベクトルをスカラー倍する関数
-Vector3 Multiply(float scalar, const Vector3& v) {
-	return { scalar * v.x, scalar * v.y, scalar * v.z };
-}
+Vector3 Multiply(float scalar, const Vector3& v) { return {scalar * v.x, scalar * v.y, scalar * v.z}; }
 
 // 内積を計算する関数
-float Dot(const Vector3& v1, const Vector3& v2) {
-	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-}
+float Dot(const Vector3& v1, const Vector3& v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z; }
 
 // ベクトルの長さを計算する関数
-float Length(const Vector3& v) {
-	return sqrtf(Dot(v, v));
-}
+float Length(const Vector3& v) { return sqrtf(Dot(v, v)); }
 
 // ベクトルを正規化する関数
 Vector3 Normalize(const Vector3& v) {
 	float length = Length(v);
 	if (length == 0) {
-		return { 0, 0, 0 };
+		return {0, 0, 0};
 	}
 	return Multiply(1.0f / length, v);
 }
 
-//クロス積
+// クロス積
 Vector3 Cross(const Vector3& v1, const Vector3& v2) {
-	Vector3 result = { v1.y * v2.z - v1.z * v2.y,v1.z * v2.x - v1.x * v2.z,v1.x * v2.y - v1.y * v2.x };
+	Vector3 result = {v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x};
 	return result;
 }
 
@@ -71,31 +65,29 @@ Vector3 Project(const Vector3& v1, Vector3& v2) {
 
 // 最近接点を求める関数
 Vector3 ClosestPoint(const Vector3& lineStart, const Vector3& lineEnd, const Vector3& point) {
-	Vector3 lineDir = { lineEnd.x - lineStart.x, lineEnd.y - lineStart.y, lineEnd.z - lineStart.z };
-	Vector3 pointToLineStart = { point.x - lineStart.x, point.y - lineStart.y, point.z - lineStart.z };
-	float t = (lineDir.x * pointToLineStart.x + lineDir.y * pointToLineStart.y + lineDir.z * pointToLineStart.z) /
-		(lineDir.x * lineDir.x + lineDir.y * lineDir.y + lineDir.z * lineDir.z);
+	Vector3 lineDir = {lineEnd.x - lineStart.x, lineEnd.y - lineStart.y, lineEnd.z - lineStart.z};
+	Vector3 pointToLineStart = {point.x - lineStart.x, point.y - lineStart.y, point.z - lineStart.z};
+	float t = (lineDir.x * pointToLineStart.x + lineDir.y * pointToLineStart.y + lineDir.z * pointToLineStart.z) / (lineDir.x * lineDir.x + lineDir.y * lineDir.y + lineDir.z * lineDir.z);
 	if (t < 0) {
-		return { lineStart.x, lineStart.y, lineStart.z };
+		return {lineStart.x, lineStart.y, lineStart.z};
 	} else if (t > 1) {
-		return { lineEnd.x, lineEnd.y, lineEnd.z };
+		return {lineEnd.x, lineEnd.y, lineEnd.z};
 	} else {
-		return { lineStart.x + t * lineDir.x, lineStart.y + t * lineDir.y, lineStart.z + t * lineDir.z };
+		return {lineStart.x + t * lineDir.x, lineStart.y + t * lineDir.y, lineStart.z + t * lineDir.z};
 	}
 }
 
 // ベクトルの長さを求める関数
 Vector3 Perpendicular(const Vector3& vector) {
 	if (vector.x != 0.0f || vector.y != 0.0f) {
-		return { -vector.y, vector.x, 0.0f };
+		return {-vector.y, vector.x, 0.0f};
 	}
-	return { 0.0f, -vector.z, vector.y };
+	return {0.0f, -vector.z, vector.y};
 }
 
 // 線形補間
-Vector3 Lerp(const Vector3& v1, const Vector3& v2, const float& t) {
-	return Add(Multiply(t, v1), Multiply(1.0f - t, v2));
-}
+float Lerp(float a, float b, float t) { return a + (b - a) * t; }
+Vector3 Lerp(const Vector3& v1, const Vector3& v2, const float& t) { return Add(Multiply(t, v1), Multiply(1.0f - t, v2)); }
 
 // ベジエ
 Vector3 Bezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const float& t) {
@@ -104,35 +96,39 @@ Vector3 Bezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const fl
 	return Lerp(p0p1, p1p2, t);
 }
 
+// 反発ベクトルを求める
+Vector3 Reflect(const Vector3& input, const Vector3& normal) { return input - 2.0f * (Dot(input, normal) * normal); }
+#pragma endregion
+
+#pragma region Matrix4x4
 // 逆行列(Matrix4x4)
 Matrix4x4 Inverse(const Matrix4x4& m) {
-	Matrix4x4 result = { 0 };
-	Matrix4x4 num = { 0 };
-	float det =
-		m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3]//1
-		+ m.m[0][0] * m.m[1][2] * m.m[2][3] * m.m[3][1]//2
-		+ m.m[0][0] * m.m[1][3] * m.m[2][1] * m.m[3][2]//3
-		- m.m[0][0] * m.m[1][3] * m.m[2][2] * m.m[3][1]//4
-		- m.m[0][0] * m.m[1][2] * m.m[2][1] * m.m[3][3]//5
-		- m.m[0][0] * m.m[1][1] * m.m[2][3] * m.m[3][2]//6
-		- m.m[0][1] * m.m[1][0] * m.m[2][2] * m.m[3][3]//7
-		- m.m[0][2] * m.m[1][0] * m.m[2][3] * m.m[3][1]//8
-		- m.m[0][3] * m.m[1][0] * m.m[2][1] * m.m[3][2]//9
-		+ m.m[0][3] * m.m[1][0] * m.m[2][2] * m.m[3][1]//10
-		+ m.m[0][2] * m.m[1][0] * m.m[2][1] * m.m[3][3]//11
-		+ m.m[0][1] * m.m[1][0] * m.m[2][3] * m.m[3][2]//12
-		+ m.m[0][1] * m.m[1][2] * m.m[2][0] * m.m[3][3]//13
-		+ m.m[0][2] * m.m[1][3] * m.m[2][0] * m.m[3][1]//14
-		+ m.m[0][3] * m.m[1][1] * m.m[2][0] * m.m[3][2]//15
-		- m.m[0][3] * m.m[1][2] * m.m[2][0] * m.m[3][1]//16
-		- m.m[0][2] * m.m[1][1] * m.m[2][0] * m.m[3][3]//17
-		- m.m[0][1] * m.m[1][3] * m.m[2][0] * m.m[3][2]//18
-		- m.m[0][1] * m.m[1][2] * m.m[2][3] * m.m[3][0]//19
-		- m.m[0][2] * m.m[1][3] * m.m[2][1] * m.m[3][0]//20
-		- m.m[0][3] * m.m[1][1] * m.m[2][2] * m.m[3][0]//21
-		+ m.m[0][3] * m.m[1][2] * m.m[2][1] * m.m[3][0]//22
-		+ m.m[0][2] * m.m[1][1] * m.m[2][3] * m.m[3][0]//23
-		+ m.m[0][1] * m.m[1][3] * m.m[2][2] * m.m[3][0];//24
+	Matrix4x4 result = {0};
+	Matrix4x4 num = {0};
+	float det = m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3]    // 1
+	            + m.m[0][0] * m.m[1][2] * m.m[2][3] * m.m[3][1]  // 2
+	            + m.m[0][0] * m.m[1][3] * m.m[2][1] * m.m[3][2]  // 3
+	            - m.m[0][0] * m.m[1][3] * m.m[2][2] * m.m[3][1]  // 4
+	            - m.m[0][0] * m.m[1][2] * m.m[2][1] * m.m[3][3]  // 5
+	            - m.m[0][0] * m.m[1][1] * m.m[2][3] * m.m[3][2]  // 6
+	            - m.m[0][1] * m.m[1][0] * m.m[2][2] * m.m[3][3]  // 7
+	            - m.m[0][2] * m.m[1][0] * m.m[2][3] * m.m[3][1]  // 8
+	            - m.m[0][3] * m.m[1][0] * m.m[2][1] * m.m[3][2]  // 9
+	            + m.m[0][3] * m.m[1][0] * m.m[2][2] * m.m[3][1]  // 10
+	            + m.m[0][2] * m.m[1][0] * m.m[2][1] * m.m[3][3]  // 11
+	            + m.m[0][1] * m.m[1][0] * m.m[2][3] * m.m[3][2]  // 12
+	            + m.m[0][1] * m.m[1][2] * m.m[2][0] * m.m[3][3]  // 13
+	            + m.m[0][2] * m.m[1][3] * m.m[2][0] * m.m[3][1]  // 14
+	            + m.m[0][3] * m.m[1][1] * m.m[2][0] * m.m[3][2]  // 15
+	            - m.m[0][3] * m.m[1][2] * m.m[2][0] * m.m[3][1]  // 16
+	            - m.m[0][2] * m.m[1][1] * m.m[2][0] * m.m[3][3]  // 17
+	            - m.m[0][1] * m.m[1][3] * m.m[2][0] * m.m[3][2]  // 18
+	            - m.m[0][1] * m.m[1][2] * m.m[2][3] * m.m[3][0]  // 19
+	            - m.m[0][2] * m.m[1][3] * m.m[2][1] * m.m[3][0]  // 20
+	            - m.m[0][3] * m.m[1][1] * m.m[2][2] * m.m[3][0]  // 21
+	            + m.m[0][3] * m.m[1][2] * m.m[2][1] * m.m[3][0]  // 22
+	            + m.m[0][2] * m.m[1][1] * m.m[2][3] * m.m[3][0]  // 23
+	            + m.m[0][1] * m.m[1][3] * m.m[2][2] * m.m[3][0]; // 24
 	// 行列式が0の場合、逆行列は存在しない
 	// 適切なエラーハンドリングを行う
 	if (det == 0) {
@@ -140,121 +136,105 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 	}
 
 	// 逆行列の計算
-	num.m[0][0] =
-		m.m[1][1] * m.m[2][2] * m.m[3][3]//1
-		+ m.m[1][2] * m.m[2][3] * m.m[3][1]//2
-		+ m.m[1][3] * m.m[2][1] * m.m[3][2]//3
-		- m.m[1][3] * m.m[2][2] * m.m[3][1]//4
-		- m.m[1][2] * m.m[2][1] * m.m[3][3]//5
-		- m.m[1][1] * m.m[2][3] * m.m[3][2];//6
-	num.m[0][1] =
-		-m.m[0][1] * m.m[2][2] * m.m[3][3]//1
-		- m.m[0][2] * m.m[2][3] * m.m[3][1]//2
-		- m.m[0][3] * m.m[2][1] * m.m[3][2]//3
-		+ m.m[0][3] * m.m[2][2] * m.m[3][1]//4
-		+ m.m[0][2] * m.m[2][1] * m.m[3][3]//5
-		+ m.m[0][1] * m.m[2][3] * m.m[3][2];//6
-	num.m[0][2] =
-		m.m[0][1] * m.m[1][2] * m.m[3][3]//1
-		+ m.m[0][2] * m.m[1][3] * m.m[3][1]//2
-		+ m.m[0][3] * m.m[1][1] * m.m[3][2]//3
-		- m.m[0][3] * m.m[1][2] * m.m[3][1]//4
-		- m.m[0][2] * m.m[1][1] * m.m[3][3]//5
-		- m.m[0][1] * m.m[1][3] * m.m[3][2];//6
-	num.m[0][3] =
-		-m.m[0][1] * m.m[1][2] * m.m[2][3]//1
-		- m.m[0][2] * m.m[1][3] * m.m[2][1]//2
-		- m.m[0][3] * m.m[1][1] * m.m[2][2]//3
-		+ m.m[0][3] * m.m[1][2] * m.m[2][1]//4
-		+ m.m[0][2] * m.m[1][1] * m.m[2][3]//5
-		+ m.m[0][1] * m.m[1][3] * m.m[2][2];//6
+	num.m[0][0] = m.m[1][1] * m.m[2][2] * m.m[3][3]    // 1
+	              + m.m[1][2] * m.m[2][3] * m.m[3][1]  // 2
+	              + m.m[1][3] * m.m[2][1] * m.m[3][2]  // 3
+	              - m.m[1][3] * m.m[2][2] * m.m[3][1]  // 4
+	              - m.m[1][2] * m.m[2][1] * m.m[3][3]  // 5
+	              - m.m[1][1] * m.m[2][3] * m.m[3][2]; // 6
+	num.m[0][1] = -m.m[0][1] * m.m[2][2] * m.m[3][3]   // 1
+	              - m.m[0][2] * m.m[2][3] * m.m[3][1]  // 2
+	              - m.m[0][3] * m.m[2][1] * m.m[3][2]  // 3
+	              + m.m[0][3] * m.m[2][2] * m.m[3][1]  // 4
+	              + m.m[0][2] * m.m[2][1] * m.m[3][3]  // 5
+	              + m.m[0][1] * m.m[2][3] * m.m[3][2]; // 6
+	num.m[0][2] = m.m[0][1] * m.m[1][2] * m.m[3][3]    // 1
+	              + m.m[0][2] * m.m[1][3] * m.m[3][1]  // 2
+	              + m.m[0][3] * m.m[1][1] * m.m[3][2]  // 3
+	              - m.m[0][3] * m.m[1][2] * m.m[3][1]  // 4
+	              - m.m[0][2] * m.m[1][1] * m.m[3][3]  // 5
+	              - m.m[0][1] * m.m[1][3] * m.m[3][2]; // 6
+	num.m[0][3] = -m.m[0][1] * m.m[1][2] * m.m[2][3]   // 1
+	              - m.m[0][2] * m.m[1][3] * m.m[2][1]  // 2
+	              - m.m[0][3] * m.m[1][1] * m.m[2][2]  // 3
+	              + m.m[0][3] * m.m[1][2] * m.m[2][1]  // 4
+	              + m.m[0][2] * m.m[1][1] * m.m[2][3]  // 5
+	              + m.m[0][1] * m.m[1][3] * m.m[2][2]; // 6
 
-	num.m[1][0] =
-		-m.m[1][0] * m.m[2][2] * m.m[3][3]//1
-		- m.m[1][2] * m.m[2][3] * m.m[3][0]//2
-		- m.m[1][3] * m.m[2][0] * m.m[3][2]//3
-		+ m.m[1][3] * m.m[2][2] * m.m[3][0]//4
-		+ m.m[1][2] * m.m[2][0] * m.m[3][3]//5
-		+ m.m[1][0] * m.m[2][3] * m.m[3][2];//6
-	num.m[1][1] =
-		m.m[0][0] * m.m[2][2] * m.m[3][3]//1
-		+ m.m[0][2] * m.m[2][3] * m.m[3][0]//2
-		+ m.m[0][3] * m.m[2][0] * m.m[3][2]//3
-		- m.m[0][3] * m.m[2][2] * m.m[3][0]//4
-		- m.m[0][2] * m.m[2][0] * m.m[3][3]//5
-		- m.m[0][0] * m.m[2][3] * m.m[3][2];//6
-	num.m[1][2] =
-		-m.m[0][0] * m.m[1][2] * m.m[3][3]//1
-		- m.m[0][2] * m.m[1][3] * m.m[3][0]//2
-		- m.m[0][3] * m.m[1][0] * m.m[3][2]//3
-		+ m.m[0][3] * m.m[1][2] * m.m[3][0]//4
-		+ m.m[0][2] * m.m[1][0] * m.m[3][3]//5
-		+ m.m[0][0] * m.m[1][3] * m.m[3][2];//6
-	num.m[1][3] =
-		m.m[0][0] * m.m[1][2] * m.m[2][3]//1
-		+ m.m[0][2] * m.m[1][3] * m.m[2][0]//2
-		+ m.m[0][3] * m.m[1][0] * m.m[2][2]//3
-		- m.m[0][3] * m.m[1][2] * m.m[2][0]//4
-		- m.m[0][2] * m.m[1][0] * m.m[2][3]//5
-		- m.m[0][0] * m.m[1][3] * m.m[2][2];//6
+	num.m[1][0] = -m.m[1][0] * m.m[2][2] * m.m[3][3]   // 1
+	              - m.m[1][2] * m.m[2][3] * m.m[3][0]  // 2
+	              - m.m[1][3] * m.m[2][0] * m.m[3][2]  // 3
+	              + m.m[1][3] * m.m[2][2] * m.m[3][0]  // 4
+	              + m.m[1][2] * m.m[2][0] * m.m[3][3]  // 5
+	              + m.m[1][0] * m.m[2][3] * m.m[3][2]; // 6
+	num.m[1][1] = m.m[0][0] * m.m[2][2] * m.m[3][3]    // 1
+	              + m.m[0][2] * m.m[2][3] * m.m[3][0]  // 2
+	              + m.m[0][3] * m.m[2][0] * m.m[3][2]  // 3
+	              - m.m[0][3] * m.m[2][2] * m.m[3][0]  // 4
+	              - m.m[0][2] * m.m[2][0] * m.m[3][3]  // 5
+	              - m.m[0][0] * m.m[2][3] * m.m[3][2]; // 6
+	num.m[1][2] = -m.m[0][0] * m.m[1][2] * m.m[3][3]   // 1
+	              - m.m[0][2] * m.m[1][3] * m.m[3][0]  // 2
+	              - m.m[0][3] * m.m[1][0] * m.m[3][2]  // 3
+	              + m.m[0][3] * m.m[1][2] * m.m[3][0]  // 4
+	              + m.m[0][2] * m.m[1][0] * m.m[3][3]  // 5
+	              + m.m[0][0] * m.m[1][3] * m.m[3][2]; // 6
+	num.m[1][3] = m.m[0][0] * m.m[1][2] * m.m[2][3]    // 1
+	              + m.m[0][2] * m.m[1][3] * m.m[2][0]  // 2
+	              + m.m[0][3] * m.m[1][0] * m.m[2][2]  // 3
+	              - m.m[0][3] * m.m[1][2] * m.m[2][0]  // 4
+	              - m.m[0][2] * m.m[1][0] * m.m[2][3]  // 5
+	              - m.m[0][0] * m.m[1][3] * m.m[2][2]; // 6
 
-	num.m[2][0] =
-		m.m[1][0] * m.m[2][1] * m.m[3][3]//1
-		+ m.m[1][1] * m.m[2][3] * m.m[3][0]//2
-		+ m.m[1][3] * m.m[2][0] * m.m[3][1]//3
-		- m.m[1][3] * m.m[2][1] * m.m[3][0]//4
-		- m.m[1][1] * m.m[2][0] * m.m[3][3]//5
-		- m.m[1][0] * m.m[2][3] * m.m[3][1];//6
-	num.m[2][1] =
-		-m.m[0][0] * m.m[2][1] * m.m[3][3]//1
-		- m.m[0][1] * m.m[2][3] * m.m[3][0]//2
-		- m.m[0][3] * m.m[2][0] * m.m[3][1]//3
-		+ m.m[0][3] * m.m[2][1] * m.m[3][0]//4
-		+ m.m[0][1] * m.m[2][0] * m.m[3][3]//5
-		+ m.m[0][0] * m.m[2][3] * m.m[3][1];//6
-	num.m[2][2] =
-		m.m[0][0] * m.m[1][1] * m.m[3][3]//1
-		+ m.m[0][1] * m.m[1][3] * m.m[3][0]//2
-		+ m.m[0][3] * m.m[1][0] * m.m[3][1]//3
-		- m.m[0][3] * m.m[1][1] * m.m[3][0]//4
-		- m.m[0][1] * m.m[1][0] * m.m[3][3]//5
-		- m.m[0][0] * m.m[1][3] * m.m[3][1];//6
-	num.m[2][3] =
-		-m.m[0][0] * m.m[1][1] * m.m[2][3]//1
-		- m.m[0][1] * m.m[1][3] * m.m[2][0]//2
-		- m.m[0][3] * m.m[1][0] * m.m[2][1]//3
-		+ m.m[0][3] * m.m[1][1] * m.m[2][0]//4
-		+ m.m[0][1] * m.m[1][0] * m.m[2][3]//5
-		+ m.m[0][0] * m.m[1][3] * m.m[2][1];//6
+	num.m[2][0] = m.m[1][0] * m.m[2][1] * m.m[3][3]    // 1
+	              + m.m[1][1] * m.m[2][3] * m.m[3][0]  // 2
+	              + m.m[1][3] * m.m[2][0] * m.m[3][1]  // 3
+	              - m.m[1][3] * m.m[2][1] * m.m[3][0]  // 4
+	              - m.m[1][1] * m.m[2][0] * m.m[3][3]  // 5
+	              - m.m[1][0] * m.m[2][3] * m.m[3][1]; // 6
+	num.m[2][1] = -m.m[0][0] * m.m[2][1] * m.m[3][3]   // 1
+	              - m.m[0][1] * m.m[2][3] * m.m[3][0]  // 2
+	              - m.m[0][3] * m.m[2][0] * m.m[3][1]  // 3
+	              + m.m[0][3] * m.m[2][1] * m.m[3][0]  // 4
+	              + m.m[0][1] * m.m[2][0] * m.m[3][3]  // 5
+	              + m.m[0][0] * m.m[2][3] * m.m[3][1]; // 6
+	num.m[2][2] = m.m[0][0] * m.m[1][1] * m.m[3][3]    // 1
+	              + m.m[0][1] * m.m[1][3] * m.m[3][0]  // 2
+	              + m.m[0][3] * m.m[1][0] * m.m[3][1]  // 3
+	              - m.m[0][3] * m.m[1][1] * m.m[3][0]  // 4
+	              - m.m[0][1] * m.m[1][0] * m.m[3][3]  // 5
+	              - m.m[0][0] * m.m[1][3] * m.m[3][1]; // 6
+	num.m[2][3] = -m.m[0][0] * m.m[1][1] * m.m[2][3]   // 1
+	              - m.m[0][1] * m.m[1][3] * m.m[2][0]  // 2
+	              - m.m[0][3] * m.m[1][0] * m.m[2][1]  // 3
+	              + m.m[0][3] * m.m[1][1] * m.m[2][0]  // 4
+	              + m.m[0][1] * m.m[1][0] * m.m[2][3]  // 5
+	              + m.m[0][0] * m.m[1][3] * m.m[2][1]; // 6
 
-	num.m[3][0] =
-		-m.m[1][0] * m.m[2][1] * m.m[3][2]//1
-		- m.m[1][1] * m.m[2][2] * m.m[3][0]//2
-		- m.m[1][2] * m.m[2][0] * m.m[3][1]//3
-		+ m.m[1][2] * m.m[2][1] * m.m[3][0]//4
-		+ m.m[1][1] * m.m[2][0] * m.m[3][2]//5
-		+ m.m[1][0] * m.m[2][2] * m.m[3][1];//6
-	num.m[3][1] =
-		m.m[0][0] * m.m[2][1] * m.m[3][2]//1
-		+ m.m[0][1] * m.m[2][2] * m.m[3][0]//2
-		+ m.m[0][2] * m.m[2][0] * m.m[3][1]//3
-		- m.m[0][2] * m.m[2][1] * m.m[3][0]//4
-		- m.m[0][1] * m.m[2][0] * m.m[3][2]//5
-		- m.m[0][0] * m.m[2][2] * m.m[3][1];//6
-	num.m[3][2] =
-		-m.m[0][0] * m.m[1][1] * m.m[3][2]//1
-		- m.m[0][1] * m.m[1][2] * m.m[3][0]//2
-		- m.m[0][2] * m.m[1][0] * m.m[3][1]//3
-		+ m.m[0][2] * m.m[1][1] * m.m[3][0]//4
-		+ m.m[0][1] * m.m[1][0] * m.m[3][2]//5
-		+ m.m[0][0] * m.m[1][2] * m.m[3][1];//6
-	num.m[3][3] =
-		m.m[0][0] * m.m[1][1] * m.m[2][2]//1
-		+ m.m[0][1] * m.m[1][2] * m.m[2][0]//2
-		+ m.m[0][2] * m.m[1][0] * m.m[2][1]//3
-		- m.m[0][2] * m.m[1][1] * m.m[2][0]//4
-		- m.m[0][1] * m.m[1][0] * m.m[2][2]//5
-		- m.m[0][0] * m.m[1][2] * m.m[2][1];//6
+	num.m[3][0] = -m.m[1][0] * m.m[2][1] * m.m[3][2]   // 1
+	              - m.m[1][1] * m.m[2][2] * m.m[3][0]  // 2
+	              - m.m[1][2] * m.m[2][0] * m.m[3][1]  // 3
+	              + m.m[1][2] * m.m[2][1] * m.m[3][0]  // 4
+	              + m.m[1][1] * m.m[2][0] * m.m[3][2]  // 5
+	              + m.m[1][0] * m.m[2][2] * m.m[3][1]; // 6
+	num.m[3][1] = m.m[0][0] * m.m[2][1] * m.m[3][2]    // 1
+	              + m.m[0][1] * m.m[2][2] * m.m[3][0]  // 2
+	              + m.m[0][2] * m.m[2][0] * m.m[3][1]  // 3
+	              - m.m[0][2] * m.m[2][1] * m.m[3][0]  // 4
+	              - m.m[0][1] * m.m[2][0] * m.m[3][2]  // 5
+	              - m.m[0][0] * m.m[2][2] * m.m[3][1]; // 6
+	num.m[3][2] = -m.m[0][0] * m.m[1][1] * m.m[3][2]   // 1
+	              - m.m[0][1] * m.m[1][2] * m.m[3][0]  // 2
+	              - m.m[0][2] * m.m[1][0] * m.m[3][1]  // 3
+	              + m.m[0][2] * m.m[1][1] * m.m[3][0]  // 4
+	              + m.m[0][1] * m.m[1][0] * m.m[3][2]  // 5
+	              + m.m[0][0] * m.m[1][2] * m.m[3][1]; // 6
+	num.m[3][3] = m.m[0][0] * m.m[1][1] * m.m[2][2]    // 1
+	              + m.m[0][1] * m.m[1][2] * m.m[2][0]  // 2
+	              + m.m[0][2] * m.m[1][0] * m.m[2][1]  // 3
+	              - m.m[0][2] * m.m[1][1] * m.m[2][0]  // 4
+	              - m.m[0][1] * m.m[1][0] * m.m[2][2]  // 5
+	              - m.m[0][0] * m.m[1][2] * m.m[2][1]; // 6
 	// 行列式で割る
 	for (int i = 0; i < 4; ++i) {
 		for (int j = 0; j < 4; ++j) {
@@ -289,7 +269,7 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale) {
 
 // 回転行列(Matrix4x4)
 // X軸回転行列
-Matrix4x4  MakeRotateXMatrix(float radian) {
+Matrix4x4 MakeRotateXMatrix(float radian) {
 	Matrix4x4 matrix = {};
 	matrix.m[0][0] = 1;
 	matrix.m[1][1] = std::cosf(radian);
@@ -301,7 +281,7 @@ Matrix4x4  MakeRotateXMatrix(float radian) {
 }
 
 // Y軸回転行列
-Matrix4x4  MakeRotateYMatrix(float radian) {
+Matrix4x4 MakeRotateYMatrix(float radian) {
 	Matrix4x4 matrix = {};
 	matrix.m[0][0] = std::cosf(radian);
 	matrix.m[0][2] = -std::sinf(radian);
@@ -313,7 +293,7 @@ Matrix4x4  MakeRotateYMatrix(float radian) {
 }
 
 // Z軸回転行列
-Matrix4x4  MakeRotateZMatrix(float radian) {
+Matrix4x4 MakeRotateZMatrix(float radian) {
 	Matrix4x4 matrix = {};
 	matrix.m[0][0] = std::cosf(radian);
 	matrix.m[0][1] = std::sinf(radian);
@@ -332,7 +312,7 @@ Matrix4x4 MakeRotateMatrix(float roll, float pitch, float yaw) {
 	return Multiply(Multiply(rotateX, rotateY), rotateZ);
 }
 
-//　アフィン変換行列(Matrix4x4)
+// 　アフィン変換行列(Matrix4x4)
 Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, Vector3& translate) {
 	// 拡大縮小行列、回転行列、平行移動行列を作成
 	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
@@ -367,7 +347,7 @@ Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float botto
 	return result;
 }
 
-// ビューポート変換行列	
+// ビューポート変換行列
 Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth) {
 	Matrix4x4 result = {};
 	result.m[0][0] = width / 2.0f;
@@ -407,8 +387,7 @@ Matrix4x4 Multiply(const Matrix4x4& a, const Matrix4x4& b) {
 	Matrix4x4 result = {};
 	for (int i = 0; i < 4; ++i) {
 		for (int j = 0; j < 4; ++j) {
-			result.m[i][j] = a.m[i][0] * b.m[0][j] + a.m[i][1] * b.m[1][j] +
-				a.m[i][2] * b.m[2][j] + a.m[i][3] * b.m[3][j];
+			result.m[i][j] = a.m[i][0] * b.m[0][j] + a.m[i][1] * b.m[1][j] + a.m[i][2] * b.m[2][j] + a.m[i][3] * b.m[3][j];
 		}
 	}
 	return result;
@@ -416,7 +395,7 @@ Matrix4x4 Multiply(const Matrix4x4& a, const Matrix4x4& b) {
 
 // 行列の転置
 Matrix4x4 Transpose(const Matrix4x4& m) {
-	Matrix4x4 result = { 0 };
+	Matrix4x4 result = {0};
 	for (int i = 0; i < 4; ++i) {
 		for (int j = 0; j < 4; ++j) {
 			result.m[i][j] = m.m[j][i];
@@ -427,9 +406,50 @@ Matrix4x4 Transpose(const Matrix4x4& m) {
 
 // 単位行列の作成
 Matrix4x4 MakeIdentity() {
-	Matrix4x4 identity = { 0 };
+	Matrix4x4 identity = {0};
 	for (int i = 0; i < 4; ++i) {
 		identity.m[i][i] = 1.0f;
 	}
 	return identity;
 }
+#pragma endregion
+
+#pragma region 演算子オーバーロード
+// 二公演算子
+Vector3 operator+(const Vector3& v1, const Vector3& v2) { return Add(v1, v2); }
+Vector3 operator-(const Vector3& v1, const Vector3& v2) { return Subtract(v1, v2); }
+Vector3 operator*(float s, const Vector3& v) { return Multiply(s, v); }
+Vector3 operator*(const Vector3& v, float s) { return s * v; }
+Vector3 operator/(const Vector3& v, float s) { return Multiply(1.0f / s, v); }
+Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2) { return Add(m1, m2); }
+Matrix4x4 operator-(const Matrix4x4& m1, const Matrix4x4& m2) { return Subtract(m1, m2); }
+Matrix4x4 operator*(const Matrix4x4& m1, const Matrix4x4& m2) { return Multiply(m1, m2); }
+// 単項演算子
+Vector3 operator-(const Vector3& v) { return {-v.x, -v.y, -v.z}; }
+Vector3 operator+(const Vector3& v) { return v; }
+// 複合代入演算子
+Vector3& operator*=(Vector3& v, float s) {
+	v.x *= s;
+	v.y *= s;
+	v.z *= s;
+	return v;
+}
+Vector3& operator-=(Vector3& v1, const Vector3& v2) {
+	v1.x -= v2.x;
+	v1.y -= v2.y;
+	v1.z -= v2.z;
+	return v1;
+}
+Vector3& operator+=(Vector3& v1, const Vector3& v2) {
+	v1.x += v2.x;
+	v1.y += v2.y;
+	v1.z += v2.z;
+	return v1;
+}
+Vector3& operator/=(Vector3& v, float s) {
+	v.x /= s;
+	v.y /= s;
+	v.z /= s;
+	return v;
+}
+#pragma endregion

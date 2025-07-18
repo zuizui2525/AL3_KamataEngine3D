@@ -4,6 +4,7 @@
 // KamataEngineの名前空間を使用
 using namespace KamataEngine;
 
+#pragma region Vector3
 // ベクトルの加算を計算する関数
 Vector3 Add(const Vector3& v1, const Vector3& v2);
 // ベクトルの引き算を計算する関数
@@ -27,10 +28,15 @@ Vector3 ClosestPoint(const Vector3& lineStart, const Vector3& lineEnd, const Vec
 // ベクトルの長さを求める関数
 Vector3 Perpendicular(const Vector3& vector);
 // 線形補間
+float Lerp(float a, float b, float t);
 Vector3 Lerp(const Vector3& v1, const Vector3& v2, const float& t);
 // ベジエ
 Vector3 Bezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const float& t);
+// 反発ベクトルを求める
+Vector3 Reflect(const Vector3& input, const Vector3& normal);
+#pragma endregion
 
+#pragma region Matrix4x4
 // 逆行列(Matrix4x4)
 Matrix4x4 Inverse(const Matrix4x4& m);
 // 平行移動行列(Matrix4x4)
@@ -64,3 +70,24 @@ Matrix4x4 Multiply(const Matrix4x4& a, const Matrix4x4& b);
 Matrix4x4 Transpose(const Matrix4x4& m);
 // 単位ベクトルの作成
 Matrix4x4 MakeIdentity();
+#pragma endregion
+
+#pragma region 演算子オーバーロード
+// 二項演算子
+Vector3 operator+(const Vector3& v1, const Vector3& v2);
+Vector3 operator-(const Vector3& v1, const Vector3& v2);
+Vector3 operator*(float s, const Vector3& v);
+Vector3 operator*(const Vector3& v, float s);
+Vector3 operator/(const Vector3& v, float s);
+Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2);
+Matrix4x4 operator-(const Matrix4x4& m1, const Matrix4x4& m2);
+Matrix4x4 operator*(const Matrix4x4& m1, const Matrix4x4& m2);
+// 単項演算子
+Vector3 operator-(const Vector3& v);
+Vector3 operator+(const Vector3& v);
+// 複合代入演算子
+Vector3& operator*=(Vector3& v, float s);
+Vector3& operator-=(Vector3& v1, const Vector3& v2);
+Vector3& operator+=(Vector3& v1, const Vector3& v2);
+Vector3& operator/=(Vector3& v, float s);
+#pragma endregion

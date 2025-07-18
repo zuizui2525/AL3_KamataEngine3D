@@ -12,6 +12,9 @@ GameScene::~GameScene() {
 	delete skydome_;
 	// デバックカメラの解放
 	delete debugCamera_;
+	// プレイヤーの解放
+	delete player_;
+	delete modelPlayer_;
 	// マップチップフィールドの解放
 	delete mapChipField_;
 	// ブロック用のワールドトランスフォームの解放
@@ -41,6 +44,12 @@ void GameScene::Initialize() {
 	mapChipField_ = new MapChipField;
 	mapChipField_->LoadMapChipCsv("Resources/mapChipData/mapChip.csv");
 	GenerateBlocks();
+	// プレイヤー
+	// 座標をマップチップ番号で指定
+	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(1, 18);
+	modelPlayer_ = Model::CreateFromOBJ("PatiDigda", true);
+	player_ = new Player();
+	player_->Initialize(modelPlayer_, &camera_, playerPosition);
 }
 
 // ゲームの更新処理
@@ -79,6 +88,8 @@ void GameScene::Update() {
 	}
 	// 天球
 	skydome_->Update();
+	// プレイヤー
+	player_->Update();
 }
 
 // 描画処理
@@ -101,8 +112,11 @@ void GameScene::Draw() {
 		}
 	}
 
+	// プレイヤーの描画
+	player_->Draw();
+
 	// モデル後処理
-	modelBlock_->PostDraw();
+	Model::PostDraw();
 }
 
 void GameScene::GenerateBlocks() { 

@@ -3,6 +3,7 @@
 #include "KamataEngine.h"
 #include "Skydome.h"
 #include "MapChipField.h"
+#include "Player.h"
 
 // ゲームシーン  
 class GameScene {  
@@ -24,6 +25,10 @@ private:
 	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;  
 	// マップチップフィールド
 	MapChipField* mapChipField_;
+	// プレイヤー
+	Player* player_;
+	KamataEngine::Model* modelPlayer_;
+
 public:  
 	// デストラクタ  
 	~GameScene();  
