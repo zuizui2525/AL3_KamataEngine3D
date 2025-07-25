@@ -4,6 +4,7 @@
 #include "Skydome.h"
 #include "MapChipField.h"
 #include "Player.h"
+#include "CameraController.h"
 
 // ゲームシーン  
 class GameScene {  
@@ -13,21 +14,23 @@ private:
 	// 3Dモデル  
 	KamataEngine::Model* modelBlock_;
 	// 天球
-	Skydome* skydome_;
-	KamataEngine::Model* modelSkydome_;
+	Skydome* skydome_ = nullptr;
+	KamataEngine::Model* modelSkydome_ = nullptr;
 	// カメラ
 	KamataEngine::Camera camera_;
 	// デバックカメラ
-	KamataEngine::DebugCamera* debugCamera_;
+	KamataEngine::DebugCamera* debugCamera_ = nullptr;
 	// デバックカメラ有効
 	bool isDebugCameraActive_ = false;
+	// コントロールカメラ
+	CameraController* cameraController_ = nullptr;
 	// ブロック用のワールドトランスフォーム 
 	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;  
 	// マップチップフィールド
-	MapChipField* mapChipField_;
+	MapChipField* mapChipField_ = nullptr;
 	// プレイヤー
-	Player* player_;
-	KamataEngine::Model* modelPlayer_;
+	Player* player_ = nullptr;
+	KamataEngine::Model* modelPlayer_ = nullptr;
 
 public:  
 	// デストラクタ  

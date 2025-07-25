@@ -63,4 +63,7 @@ public :
 	/// 描画
 	/// </summary>
 	void Draw();
+
+	WorldTransform& GetWorldTransform() { return worldTransform_; };
+	Vector3& GetVelocity() { return velocity_; };
 };

@@ -12,6 +12,8 @@ GameScene::~GameScene() {
 	delete skydome_;
 	// デバックカメラの解放
 	delete debugCamera_;
+	// コントロールカメラの解放
+	delete cameraController_;
 	// プレイヤーの解放
 	delete player_;
 	delete modelPlayer_;
@@ -50,6 +52,15 @@ void GameScene::Initialize() {
 	modelPlayer_ = Model::CreateFromOBJ("PatiDigda", true);
 	player_ = new Player();
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
+	// コントロールカメラ
+	cameraController_ = new CameraController();
+	cameraController_->SetMovableArea(
+	    {mapChipField_->GetMapChipPositionByIndex(5, 0).x, mapChipField_->GetMapChipPositionByIndex(94, 0).x,
+		mapChipField_->GetMapChipPositionByIndex(0, 16).y, mapChipField_->GetMapChipPositionByIndex(0, 16).y});
+	cameraController_->SetTarget(player_);
+	cameraController_->SetCamera(&camera_);
+	cameraController_->Initialize();
+	cameraController_->Reset();
 }
 
 // ゲームの更新処理
@@ -72,8 +83,12 @@ void GameScene::Update() {
 		// ビュー行列の転送
 		camera_.TransferMatrix();
 	} else {
+		// コントロールカメラ
+		cameraController_->Update();
 		// ビュープロジェクション行列の更新と転送
 		camera_.UpdateMatrix();
+		// ビュー行列の転送
+		camera_.TransferMatrix();
 	}
 	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
