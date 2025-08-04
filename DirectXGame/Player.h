@@ -86,7 +86,7 @@ private:
 	// マップ衝突判定
 	void MapCollisionDetection(CollisionMapInfo& info);
 	void MapCollisionDetectionUp(CollisionMapInfo& info);
-	//void MapCollisionDetectionDown(CollisionMapInfo& info);
+	void MapCollisionDetectionDown(CollisionMapInfo& info);
 	//void MapCollisionDetectionLeft(CollisionMapInfo& info);
 	//void MapCollisionDetectionRight(CollisionMapInfo& info);
 	// 指定した角の座標を得る

@@ -64,7 +64,7 @@ MapChipField::MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, u
 		return MapChipType::kBlank;
 	}
 	if (yIndex < 0 || kNumBlockVirtical_ - 1 < yIndex) {
-		return MapChipType::kBlock;
+		return MapChipType::kBlank;
 	}
 	return mapChipData_.data[yIndex][xIndex];
 }
