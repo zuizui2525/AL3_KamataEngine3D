@@ -9,11 +9,36 @@ enum class LRDirection {
 	kLeft,
 };
 
+class MapChipField;
+
 /// <summary>  
 /// 自キャラ  
 /// </summary>  
 class Player {
 private:
+
+	//// 構造体 ////
+	
+	// マップとの当たり判定情報
+	struct CollisionMapInfo {
+		bool ceilingCollisionFlag = false; // 天井衝突フラグ
+		bool landingFlag = false;          // 着地フラグ
+		bool wallContactFlag = false;      // 壁接触フラグ
+		Vector3 velocity;                  // 移動量
+	};
+
+	//// 列挙型 ////
+
+	enum Corner {
+		kRightBottom, // 右下
+		kLeftBottom,  // 左下
+		kRightTop,    // 右上
+		kLeftTop,     // 左上
+		kNumCorner    // 要素数
+	};
+
+	//// 変数 ////
+	
 	// ワールド変換データ
 	WorldTransform worldTransform_;
 	// モデル
@@ -45,9 +70,32 @@ private:
 	// 最大落下速度(下方向)
 	static inline const float kLimitFallSpeed = 1.1f;
 	// ジャンプ初速(上方向)
-	static inline const float kJumpAcceleration = 1.7f;
+	static inline const float kJumpAcceleration = 1.8f;
 	// 接地フラグ
 	bool landing = false;
+	// マップチップによるフィールド
+	MapChipField* mapChipField_ = nullptr;
+	// キャラクターの当たり判定サイズ
+	static inline const float kWidth = 1.8f;
+	static inline const float kHeight = 1.8f;
+	
+	//// 関数 ////
+
+	// 移動関係
+	void HandleMoveInput();
+	// マップ衝突判定
+	void MapCollisionDetection(CollisionMapInfo& info);
+	void MapCollisionDetectionUp(CollisionMapInfo& info);
+	//void MapCollisionDetectionDown(CollisionMapInfo& info);
+	//void MapCollisionDetectionLeft(CollisionMapInfo& info);
+	//void MapCollisionDetectionRight(CollisionMapInfo& info);
+	// 指定した角の座標を得る
+	Vector3 CornerPosition(const Vector3& center, Corner corner);
+	// 判定結果を反映して移動させる
+	void ActAccordingToTheOutcomeOfTheDecision(const CollisionMapInfo& info);
+	// 天井に接触しているときの処理
+	void touchingTheCeiling(const CollisionMapInfo& info);
+
 public :
 	/// <summary>
 	/// 初期化
@@ -66,4 +114,5 @@ public :
 
 	WorldTransform& GetWorldTransform() { return worldTransform_; };
 	Vector3& GetVelocity() { return velocity_; };
+	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; };
 };

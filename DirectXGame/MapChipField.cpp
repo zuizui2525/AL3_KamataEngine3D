@@ -8,9 +8,9 @@
 using namespace KamataEngine;
 
 namespace {
-std::map<std::string, MapChipType> mapChipTable = {
-    {"0", MapChipType::kBlank},
-    {"1", MapChipType::kBlock},
+std::map<std::string, MapChipField::MapChipType> mapChipTable = {
+    {"0", MapChipField::MapChipType::kBlank},
+    {"1", MapChipField::MapChipType::kBlock},
 };
 }
 
@@ -59,7 +59,7 @@ void MapChipField::LoadMapChipCsv(const std::string& filePath) {
 	}
 }
 
-MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex) {
+MapChipField::MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex) {
 	if (xIndex < 0 || kNumBlockHorizontal_ - 1 < xIndex) {
 		return MapChipType::kBlank;
 	}
@@ -71,4 +71,22 @@ MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex
 
 Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex) { 
 	return Vector3(kBlockWidth_ * xIndex, kBlockHeight_ * (kNumBlockVirtical_ - 1 - yIndex), 0); 
+}
+
+MapChipField::IndexSet MapChipField::GetMapChipIndexSetByPosition(const Vector3& position) {
+	IndexSet indexSet = {};
+	indexSet.xIndex = static_cast<uint32_t>((position.x + kBlockWidth_ / 2.0f) / kBlockWidth_);
+	indexSet.yIndex = static_cast<uint32_t>(kNumBlockVirtical_ - 1.0f - (position.y + kBlockHeight_ / 2.0f) / kBlockHeight_);
+	return indexSet;
+}
+
+MapChipField::Rect MapChipField::GetRectByIndex(uint32_t xIndex, uint32_t yIndex) {
+	// 指定ブロックの中心座標を取得する
+	Vector3 center = GetMapChipPositionByIndex(xIndex, yIndex);
+	Rect rect{};
+	rect.left = center.x - kBlockWidth_ / 2.0f;
+	rect.right = center.x + kBlockWidth_ / 2.0f;
+	rect.bottom = center.y - kBlockHeight_ / 2.0f;
+	rect.top = center.y + kBlockHeight_ / 2.0f;
+	return rect;
 }

@@ -52,6 +52,7 @@ void GameScene::Initialize() {
 	modelPlayer_ = Model::CreateFromOBJ("PatiDigda", true);
 	player_ = new Player();
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
+	player_->SetMapChipField(mapChipField_);
 	// コントロールカメラ
 	cameraController_ = new CameraController();
 	cameraController_->SetMovableArea(
@@ -148,7 +149,7 @@ void GameScene::GenerateBlocks() {
 
 	for (uint32_t i = 0; i < numBlockVirtical; ++i) {
 		for (uint32_t j = 0; j < numBlockHorizontal; ++j) {
-			if (mapChipField_->GetMapChipTypeByIndex(j, i) == MapChipType::kBlock) {
+			if (mapChipField_->GetMapChipTypeByIndex(j, i) == MapChipField::MapChipType::kBlock) {
 				WorldTransform* worldTransform = new WorldTransform();
 				worldTransform->Initialize();
 				worldTransformBlocks_[i][j] = worldTransform;
