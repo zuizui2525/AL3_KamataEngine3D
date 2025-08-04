@@ -199,33 +199,33 @@ void Player::MapCollisionDetectionDown(CollisionMapInfo& info) {
 	bool hitRight = false;
 	// 左上点の判定
 	MapChipField::IndexSet indexSet{};
-	indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionsNew[kLeftBottom]);
+	indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionsNew[kLeftTop]);
 	mapChipType = mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex);
 	if (mapChipType == MapChipField::MapChipType::kBlock) {
 		hitLeft = true;
 	}
 	// 右上点の判定
-	indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionsNew[kRightBottom]);
+	indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionsNew[kRightTop]);
 	mapChipType = mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex);
 	if (mapChipType == MapChipField::MapChipType::kBlock) {
 		hitRight = true;
 	}
 	if (hitLeft) {
 		// 地面のどのマスに当たったかを取得
-		indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionsNew[kLeftBottom]);
+		indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionsNew[kLeftTop]);
 		// 地面の矩形情報を取得
 		MapChipField::Rect rect = mapChipField_->GetRectByIndex(indexSet.xIndex, indexSet.yIndex);
 		// Y方向の移動量を調整（めり込みを防ぐ）
-		info.velocity.y = (std::max)(0.0f, rect.bottom - positionsNew[kLeftBottom].y + kPenetrationBuffer);
+		info.velocity.y = (std::min)(0.0f, rect.top - positionsNew[kLeftTop].y + kPenetrationBuffer);
 		// フラグを立てる
 		info.landingFlag = true;
 	} else if (hitRight) {
 		// 地面のどのマスに当たったかを取得
-		indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionsNew[kRightBottom]);
+		indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionsNew[kRightTop]);
 		// 地面の矩形情報を取得
 		MapChipField::Rect rect = mapChipField_->GetRectByIndex(indexSet.xIndex, indexSet.yIndex);
 		// Y方向の移動量を調整（めり込みを防ぐ）
-		info.velocity.y = (std::max)(0.0f, rect.bottom - positionsNew[kRightBottom].y + kPenetrationBuffer);
+		info.velocity.y = (std::min)(0.0f, rect.top - positionsNew[kRightTop].y + kPenetrationBuffer);
 		// フラグを立てる
 		info.landingFlag = true;
 	}
