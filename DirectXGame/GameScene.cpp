@@ -62,8 +62,8 @@ void GameScene::Initialize() {
 	// コントロールカメラ
 	cameraController_ = new CameraController();
 	cameraController_->SetMovableArea(
-	    {mapChipField_->GetMapChipPositionByIndex(5, 0).x, mapChipField_->GetMapChipPositionByIndex(94, 0).x, mapChipField_->GetMapChipPositionByIndex(0, 16).y,
-	     mapChipField_->GetMapChipPositionByIndex(0, 16).y});
+	    {mapChipField_->GetMapChipPositionByIndex(11, 0).x, mapChipField_->GetMapChipPositionByIndex(88, 0).x, 
+		 mapChipField_->GetMapChipPositionByIndex(0, 13).y, mapChipField_->GetMapChipPositionByIndex(0, 13).y});
 	cameraController_->SetTarget(player_);
 	cameraController_->SetCamera(&camera_);
 	cameraController_->Initialize();
