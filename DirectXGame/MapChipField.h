@@ -35,6 +35,8 @@ private:
 	static inline const uint32_t kNumBlockHorizontal_ = 100;
 	MapChipData mapChipData_;
 public:
+	static float GetBlockWidth() { return kBlockWidth_; };
+	static float GetBlockHeight() { return kBlockHeight_; };
 	uint32_t GetNumBlockVirtical() { return kNumBlockVirtical_; };
 	uint32_t GetNumBlockHorizontal() { return kNumBlockHorizontal_; };
 	void ResetMapChipData();

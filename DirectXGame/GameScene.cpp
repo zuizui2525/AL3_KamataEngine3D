@@ -1,5 +1,6 @@
 #include "GameScene.h"
 #include "Function.h"
+#include "Collision.h"
 
 // KamataEngineの名前空間を使用
 using namespace KamataEngine;
@@ -17,6 +18,11 @@ GameScene::~GameScene() {
 	// プレイヤーの解放
 	delete player_;
 	delete modelPlayer_;
+	// 敵の解放
+	delete modelEnemy_;
+	for (Enemy* enemy : enemies_) {
+		delete enemy;
+	}
 	// マップチップフィールドの解放
 	delete mapChipField_;
 	// ブロック用のワールドトランスフォームの解放
@@ -56,17 +62,26 @@ void GameScene::Initialize() {
 	// コントロールカメラ
 	cameraController_ = new CameraController();
 	cameraController_->SetMovableArea(
-	    {mapChipField_->GetMapChipPositionByIndex(5, 0).x, mapChipField_->GetMapChipPositionByIndex(94, 0).x,
-		mapChipField_->GetMapChipPositionByIndex(0, 16).y, mapChipField_->GetMapChipPositionByIndex(0, 16).y});
+	    {mapChipField_->GetMapChipPositionByIndex(5, 0).x, mapChipField_->GetMapChipPositionByIndex(94, 0).x, mapChipField_->GetMapChipPositionByIndex(0, 16).y,
+	     mapChipField_->GetMapChipPositionByIndex(0, 16).y});
 	cameraController_->SetTarget(player_);
 	cameraController_->SetCamera(&camera_);
 	cameraController_->Initialize();
 	cameraController_->Reset();
+	// 敵
+	modelEnemy_ = Model::CreateFromOBJ("enemy", true);
+	for (int32_t i = 0; i < 3; ++i) {
+		Enemy* newEnemy = new Enemy();
+		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(i*2 + 24, 18);
+		newEnemy->Initialize(modelEnemy_, &camera_, enemyPosition);
+
+		enemies_.push_back(newEnemy);
+	}
 }
 
 // ゲームの更新処理
 void GameScene::Update() {
-	#ifdef _DEBUG
+#ifdef _DEBUG
 	if (Input::GetInstance()->TriggerKey(DIK_R)) {
 		if (isDebugCameraActive_ == true) {
 			isDebugCameraActive_ = false;
@@ -74,7 +89,27 @@ void GameScene::Update() {
 			isDebugCameraActive_ = true;
 		}
 	}
-	#endif
+#endif
+	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
+		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
+			if (!worldTransformBlock) {
+				continue;
+			}
+			// アフィン変換行列の作成
+			worldTransformBlock->matWorld_ = MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
+			// 定数バッファに転送する
+			worldTransformBlock->TransferMatrix();
+		}
+	}
+	// 天球
+	skydome_->Update();
+	// プレイヤー
+	player_->Update();
+	// 敵
+	for (Enemy* enemy : enemies_) {
+		enemy->Update();
+	}
+
 	// カメラの処理
 	if (isDebugCameraActive_) {
 		// デバックカメラの更新
@@ -91,28 +126,16 @@ void GameScene::Update() {
 		// ビュー行列の転送
 		camera_.TransferMatrix();
 	}
-	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
-		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
-			if (!worldTransformBlock) {
-				continue;
-			}
-			// アフィン変換行列の作成
-			worldTransformBlock->matWorld_ = MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
-			// 定数バッファに転送する
-			worldTransformBlock->TransferMatrix();
-		}
-	}
-	// 天球
-	skydome_->Update();
-	// プレイヤー
-	player_->Update();
+
+	// 当たり判定
+	CheckAllCollisions();
 }
 
 // 描画処理
 void GameScene::Draw() {
 	// モデル前処理
 	Model::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
-	
+
 	// 天球の描画
 	skydome_->Draw();
 
@@ -131,11 +154,16 @@ void GameScene::Draw() {
 	// プレイヤーの描画
 	player_->Draw();
 
+	// 敵の描画
+	for (Enemy* enemy : enemies_) {
+		enemy->Draw();
+	}
+
 	// モデル後処理
 	Model::PostDraw();
 }
 
-void GameScene::GenerateBlocks() { 
+void GameScene::GenerateBlocks() {
 	uint32_t numBlockVirtical = mapChipField_->GetNumBlockVirtical();
 	uint32_t numBlockHorizontal = mapChipField_->GetNumBlockHorizontal();
 
@@ -157,4 +185,28 @@ void GameScene::GenerateBlocks() {
 			}
 		}
 	}
+}
+
+// 全ての当たり判定を行う
+void GameScene::CheckAllCollisions() {
+#pragma region 自キャラと敵キャラ
+	// 判定対象
+	AABB aabb1, aabb2;
+	// 自キャラの座標
+	aabb1 = player_->GetAABB();
+
+	// 自キャラと敵の当たり判定
+	for (Enemy* enemy : enemies_) {
+		// 敵キャラの座標
+		aabb2 = enemy->GetAABB();
+
+		// AABB同士の交差判定
+		if (IsCollision(aabb1, aabb2)) {
+			// 自キャラの衝突判定
+			player_->OnCollision(enemy);
+			// 敵の衝突判定
+			enemy->OnCollision(player_);
+		}
+	}
+#pragma endregion
 }

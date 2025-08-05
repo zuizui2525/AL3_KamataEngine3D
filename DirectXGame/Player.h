@@ -1,15 +1,12 @@
 #pragma once  
 #include "KamataEngine.h"  
+#include "struct.h"
 
 // KamataEngineの名前空間を使用
 using namespace KamataEngine;
 
-enum class LRDirection {
-	kRight,
-	kLeft,
-};
-
 class MapChipField;
+class Enemy;
 
 /// <summary>  
 /// 自キャラ  
@@ -28,6 +25,10 @@ private:
 	};
 
 	//// 列挙型 ////
+	enum class LRDirection {
+		kRight,
+		kLeft,
+	};
 
 	enum Corner {
 		kRightBottom, // 右下
@@ -50,7 +51,7 @@ private:
 	// 速度
 	Vector3 velocity_ = {};
 	// 固定の加速度
-	static inline const float kAcceleration = 0.01f;
+	static inline const float kAcceleration = 0.2f;
 	// 固定の減衰抵抗力
 	static inline const float kAttenuation = 0.08f;
 	// 最大速度制限
@@ -68,7 +69,7 @@ private:
 	// 重力加速度(下方向)
 	static inline const float kGravityAccleration = 9.8f / 60.0f;
 	// 最大落下速度(下方向)
-	static inline const float kLimitFallSpeed = 1.1f;
+	static inline const float kLimitFallSpeed = 0.8f;
 	// ジャンプ初速(上方向)
 	static inline const float kJumpAcceleration = 1.8f;
 	// 接地フラグ
@@ -78,6 +79,10 @@ private:
 	// キャラクターの当たり判定サイズ
 	static inline const float kWidth = 1.8f;
 	static inline const float kHeight = 1.8f;
+	// 着地時の速度減衰率
+	static inline const float kAttenuationLanding = 0.8f;
+	// 着地時の速度減衰率
+	static inline const float kAttenuationWall = 0.8f;
 	
 	//// 関数 ////
 
@@ -87,15 +92,18 @@ private:
 	void MapCollisionDetection(CollisionMapInfo& info);
 	void MapCollisionDetectionUp(CollisionMapInfo& info);
 	void MapCollisionDetectionDown(CollisionMapInfo& info);
-	//void MapCollisionDetectionLeft(CollisionMapInfo& info);
-	//void MapCollisionDetectionRight(CollisionMapInfo& info);
+	void MapCollisionDetectionLeft(CollisionMapInfo& info);
+	void MapCollisionDetectionRight(CollisionMapInfo& info);
 	// 指定した角の座標を得る
 	Vector3 CornerPosition(const Vector3& center, Corner corner);
 	// 判定結果を反映して移動させる
 	void ActAccordingToTheOutcomeOfTheDecision(const CollisionMapInfo& info);
 	// 天井に接触しているときの処理
 	void touchingTheCeiling(const CollisionMapInfo& info);
-
+	// 設置状態の切り替え処理
+	void SwitchingInstallationStatus(const CollisionMapInfo& info);
+	// 壁に接触している場合の処理
+	void contactWithAWall(const CollisionMapInfo& info);
 public :
 	/// <summary>
 	/// 初期化
@@ -115,4 +123,8 @@ public :
 	WorldTransform& GetWorldTransform() { return worldTransform_; };
 	Vector3& GetVelocity() { return velocity_; };
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; };
+	Vector3 GetWorldPosition();
+	AABB GetAABB();
+	// 衝突判定
+	void OnCollision(const Enemy* enemy);
 };

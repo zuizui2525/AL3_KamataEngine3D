@@ -5,6 +5,7 @@
 #include "MapChipField.h"
 #include "Player.h"
 #include "CameraController.h"
+#include "Enemy.h"
 
 // ゲームシーン  
 class GameScene {  
@@ -31,6 +32,9 @@ private:
 	// プレイヤー
 	Player* player_ = nullptr;
 	KamataEngine::Model* modelPlayer_ = nullptr;
+	// 敵
+	std::list<Enemy*> enemies_;
+	KamataEngine::Model* modelEnemy_ = nullptr;
 
 public:  
 	// デストラクタ  
@@ -43,4 +47,6 @@ public:
 	void Draw();  
 	// 表示ブロックの生成
 	void GenerateBlocks();
+	// 全ての当たり判定を行う
+	void CheckAllCollisions();
 };

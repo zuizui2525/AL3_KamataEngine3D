@@ -1,9 +1,14 @@
 #include "Function.h"
 #include <assert.h>
+#define _USE_MATH_DEFINES
+#include <Math.h>
 #include <cmath>
 
 // KamataEngineの名前空間を使用
 using namespace KamataEngine;
+
+// 度からラジアンに変換する関数
+float ConvertToRadian(float degree) { return degree * (static_cast<float>(M_PI) / 180.0f); }
 
 #pragma region Vector3
 // ベクトルの加算を計算する関数
