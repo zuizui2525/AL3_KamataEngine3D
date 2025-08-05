@@ -87,8 +87,8 @@ AABB Player::GetAABB() {
 // 衝突判定
 void Player::OnCollision(const Enemy* enemy) {
 	(void)enemy;
-	// ジャンプ開始
-	velocity_ += Vector3(0.0f, 1.8f, 0.0f);
+	// フラグを立てる
+	isDead_ = true;
 }
 
 void Player::HandleMoveInput() {

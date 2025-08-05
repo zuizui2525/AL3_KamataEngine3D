@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "CameraController.h"
 #include "Enemy.h"
+#include "DeathParticle.h"
 
 // ゲームシーン  
 class GameScene {  
@@ -35,6 +36,18 @@ private:
 	// 敵
 	std::list<Enemy*> enemies_;
 	KamataEngine::Model* modelEnemy_ = nullptr;
+	// デスパーティクル
+	DeathParticle* deathParticles_ = nullptr;
+	KamataEngine::Model* modelDeathParticle_ = nullptr;
+	// ゲームのフェーズ（型）
+	enum class Phase {
+		kPlay, // ゲームプレイ
+		kDeath, // デス演出
+	};
+	// ゲームの現在フェーズ（変数）
+	Phase phase_;
+	// 終了フラグ
+	bool finished_ = false;
 
 public:  
 	// デストラクタ  
@@ -49,4 +62,8 @@ public:
 	void GenerateBlocks();
 	// 全ての当たり判定を行う
 	void CheckAllCollisions();
+	// フェーズの切り替え
+	void ChargePhase();
+	// 終了フラグのgetter
+	bool GetFinished() const { return finished_; };
 };

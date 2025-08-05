@@ -83,7 +83,8 @@ private:
 	static inline const float kAttenuationLanding = 0.8f;
 	// 着地時の速度減衰率
 	static inline const float kAttenuationWall = 0.8f;
-	
+	// デスフラグ
+	bool isDead_ = false;
 	//// 関数 ////
 
 	// 移動関係
@@ -104,6 +105,7 @@ private:
 	void SwitchingInstallationStatus(const CollisionMapInfo& info);
 	// 壁に接触している場合の処理
 	void contactWithAWall(const CollisionMapInfo& info);
+
 public :
 	/// <summary>
 	/// 初期化
@@ -127,4 +129,6 @@ public :
 	AABB GetAABB();
 	// 衝突判定
 	void OnCollision(const Enemy* enemy);
+	// デスフラグのgetter
+	bool IsDead() const { return isDead_; };
 };
