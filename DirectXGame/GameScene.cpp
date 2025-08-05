@@ -23,6 +23,8 @@ GameScene::~GameScene() {
 	for (Enemy* enemy : enemies_) {
 		delete enemy;
 	}
+	// フェードの解放
+	delete fade_;
 	// デスパーティクルの解放
 	delete deathParticles_;
 	delete modelDeathParticle_;
@@ -39,6 +41,10 @@ GameScene::~GameScene() {
 
 // 初期化処理
 void GameScene::Initialize() {
+	// フェード
+	fade_ = new Fade();
+	fade_->Initialize();
+	fade_->Start(Fade::Status::FadeIn, fadeTime);
 	// ファイル名を指定してテクスチャハンドルを読み込む
 	textureHandle_ = TextureManager::Load("./Resources/cube/cube.jpg");
 	// カメラの初期化
@@ -83,7 +89,7 @@ void GameScene::Initialize() {
 	// デスパーティクル
 	modelDeathParticle_ = Model::CreateFromOBJ("deathParticle", true);
 	// ゲームプレイフェーズから開始
-	phase_ = Phase::kPlay;
+	phase_ = Phase::kFadeIn;
 }
 
 // ゲームの更新処理
@@ -181,10 +187,6 @@ void GameScene::Update() {
 		}
 		break;
 	}
-
-	if (deathParticles_ && deathParticles_->GetIsFinished()) {
-		finished_ = true;
-	}
 }
 
 // 描画処理
@@ -219,6 +221,9 @@ void GameScene::Draw() {
 	if (deathParticles_) {
 		deathParticles_->Draw();
 	}
+
+	// フェード
+	fade_->Draw();
 
 	// モデル後処理
 	Model::PostDraw();
@@ -274,6 +279,59 @@ void GameScene::CheckAllCollisions() {
 
 void GameScene::ChargePhase() {
 	switch (phase_) {
+	case Phase::kFadeIn:
+		// フェード
+		fade_->Update();
+		if (fade_->IsFinished()) {
+			phase_ = Phase::kPlay;
+		}
+
+#ifdef _DEBUG
+		if (Input::GetInstance()->TriggerKey(DIK_R)) {
+			if (isDebugCameraActive_ == true) {
+				isDebugCameraActive_ = false;
+			} else {
+				isDebugCameraActive_ = true;
+			}
+		}
+#endif
+		// 天球
+		skydome_->Update();
+		// プレイヤー
+		player_->Update();
+		// 敵
+		for (Enemy* enemy : enemies_) {
+			enemy->Update();
+		}
+
+		// カメラの処理
+		if (isDebugCameraActive_) {
+			// デバックカメラの更新
+			debugCamera_->Update();
+			camera_.matView = debugCamera_->GetCamera().matView;
+			camera_.matProjection = debugCamera_->GetCamera().matProjection;
+			// ビュー行列の転送
+			camera_.TransferMatrix();
+		} else {
+			// コントロールカメラ
+			cameraController_->Update();
+			// ビュープロジェクション行列の更新と転送
+			camera_.UpdateMatrix();
+			// ビュー行列の転送
+			camera_.TransferMatrix();
+		}
+		for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
+			for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
+				if (!worldTransformBlock) {
+					continue;
+				}
+				// アフィン変換行列の作成
+				worldTransformBlock->matWorld_ = MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
+				// 定数バッファに転送する
+				worldTransformBlock->TransferMatrix();
+			}
+		}
+		break;
 	case Phase::kPlay:
 		if (player_->IsDead()) {
 			// 死亡演出フェーズに切り替え
@@ -287,6 +345,17 @@ void GameScene::ChargePhase() {
 		}
 		break;
 	case Phase::kDeath:
+		if (deathParticles_ && deathParticles_->GetIsFinished()) {
+			phase_ = Phase::kFadeOut;
+			fade_->Start(Fade::Status::FadeOut, fadeTime);
+		}
+		break;
+	case Phase::kFadeOut:
+		// フェード
+		fade_->Update();
+		if (fade_->IsFinished()) {
+			finished_ = true;
+		}
 		break;
 	}
 }

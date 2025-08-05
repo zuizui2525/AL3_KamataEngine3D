@@ -7,6 +7,7 @@
 #include "CameraController.h"
 #include "Enemy.h"
 #include "DeathParticle.h"
+#include "Fade.h"
 
 // ゲームシーン  
 class GameScene {  
@@ -41,13 +42,19 @@ private:
 	KamataEngine::Model* modelDeathParticle_ = nullptr;
 	// ゲームのフェーズ（型）
 	enum class Phase {
+		kFadeIn, // フェードイン
 		kPlay, // ゲームプレイ
 		kDeath, // デス演出
+		kFadeOut, // フェードアウト 
 	};
 	// ゲームの現在フェーズ（変数）
 	Phase phase_;
 	// 終了フラグ
 	bool finished_ = false;
+	// フェード
+	Fade* fade_ = nullptr;
+	// フェード時間
+	static inline const int fadeTime = 3;
 
 public:  
 	// デストラクタ  
