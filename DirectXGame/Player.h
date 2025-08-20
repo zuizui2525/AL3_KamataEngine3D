@@ -38,6 +38,18 @@ private:
 		kNumCorner    // 要素数
 	};
 
+	enum class Behavior {
+		kUnknown, // 変更リクエストなし
+		kRoot,   // 通常状態
+		kAttack, // 攻撃中
+	};
+
+	enum class AttackPhase {
+		reservoir,
+		rush,
+		lingeringSound
+	};
+
 	//// 変数 ////
 	
 	// ワールド変換データ
@@ -85,6 +97,17 @@ private:
 	static inline const float kAttenuationWall = 0.8f;
 	// デスフラグ
 	bool isDead_ = false;
+	// 振る舞い
+	Behavior behavior_ = Behavior::kRoot;
+	// 次の振る舞いのリクエスト
+	Behavior behaviorRequest_ = Behavior::kUnknown;
+	// 攻撃ギミックの経過時間カウンター
+	uint32_t attackParameter_ = 0;
+	// 攻撃時間
+	uint32_t attackTime_ = 10;
+	// 現在の攻撃フェーズ
+	AttackPhase attackPhase_;
+
 	//// 関数 ////
 
 	// 移動関係
@@ -105,6 +128,14 @@ private:
 	void SwitchingInstallationStatus(const CollisionMapInfo& info);
 	// 壁に接触している場合の処理
 	void contactWithAWall(const CollisionMapInfo& info);
+	// 通常行動更新
+	void BehaviorRootUpdate();
+	// 攻撃行動更新
+	void BehaviorAttackUpdate();
+	// 通常攻撃初期化
+	void BehaviorRootInitialize();
+	// 攻撃行動初期化
+	void BehaviorAttackInitialize();
 
 public :
 	/// <summary>
@@ -131,4 +162,6 @@ public :
 	void OnCollision(const Enemy* enemy);
 	// デスフラグのgetter
 	bool IsDead() const { return isDead_; };
+	// 攻撃中
+	bool IsAttack() const;
 };

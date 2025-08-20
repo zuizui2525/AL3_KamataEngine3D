@@ -24,6 +24,35 @@ void Player::Initialize(Model* model, Camera* camera, const Vector3& position) {
 }
 
 void Player::Update() {	
+	if (behaviorRequest_ != Behavior::kUnknown) {
+		// 振る舞いを変更する
+		behavior_ = behaviorRequest_;
+		// ふるまいごとの初期化を実行
+		switch (behavior_) {
+		case Behavior::kRoot:
+			BehaviorRootInitialize();
+			break;
+		case Behavior::kAttack:
+			BehaviorAttackInitialize();
+			break;
+		}
+		// ふるまいリクエストをリセット
+		behaviorRequest_ = Behavior::kUnknown;
+	}
+
+	switch (behavior_) {
+	case Behavior::kRoot:
+	default:
+		BehaviorRootUpdate();
+		break;
+	case Behavior::kAttack:
+		BehaviorAttackUpdate();
+		break;
+	}
+
+}
+
+void Player::BehaviorRootUpdate() {
 	// 設置状態
 	// ①移動入力
 	HandleMoveInput();
@@ -46,21 +75,119 @@ void Player::Update() {
 		// 旋回タイマーを1/60秒だけカウントダウンする
 		turnTimer_ -= 1.0f / 60.0f;
 		// 左右の自キャラ角度テーブル
-		float destinationRotationYTable[] = {
-			std::numbers::pi_v<float> / 2.0f, 
-			std::numbers::pi_v<float> * 3.0f / 2.0f
-		};
+		float destinationRotationYTable[] = {std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float> * 3.0f / 2.0f};
 		// 状態に応じた角度を取得する
 		float destinationRotationY = destinationRotationYTable[static_cast<uint32_t>(lrDirection_)];
 		// 自キャラの角度を設定する
 		float t = 1.0f - (turnTimer_ / kTimeTurn);
 		worldTransform_.rotation_.y = Lerp(turnFirstRotationY_, destinationRotationY, t);
 	}
-	
+
+	if (Input::GetInstance()->TriggerKey(DIK_E)) {
+		// 攻撃ビヘイビアをリクエスト
+		behaviorRequest_ = Behavior::kAttack;
+	}
+
 	// アフィン変換行列の作成
 	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	// 行列を定数バッファに転送
 	worldTransform_.TransferMatrix();
+}
+
+void Player::BehaviorAttackUpdate() {
+	// 設置状態
+	// 予備動作
+	attackParameter_++;
+
+	switch (attackPhase_) {
+	case AttackPhase::reservoir:
+	default:{
+		float t = static_cast<float>(attackParameter_) / 3.0f;
+		worldTransform_.scale_.z = EaseOut(1.0f, 0.3f, t);
+		worldTransform_.scale_.y = EaseOut(1.0f, 1.6f, t);
+		// 前進動作に移行
+		if (attackParameter_ >= 3.0f) {
+			attackPhase_ = AttackPhase::rush;
+			attackParameter_ = 0; // カウンターリセット
+		}
+		break;
+	}
+	case AttackPhase::rush:{
+		float t = static_cast<float>(attackParameter_) / 3.0f;
+		worldTransform_.scale_.z = EaseOut(0.3f, 1.3f, t);
+		worldTransform_.scale_.y = EaseOut(1.6f, 0.7f, t);
+		// 余韻動作に移行
+		if (attackParameter_ >= 3.0f) {
+			attackPhase_ = AttackPhase::lingeringSound;
+			attackParameter_ = 0; // カウンターリセット
+		}
+		// 前進
+		if (worldTransform_.rotation_.y < std::numbers::pi_v<float>) {
+			velocity_ = Vector3(0.5f, 0, 0);
+		} else {
+			velocity_ = Vector3(-0.5f, 0, 0);
+		}
+		break;
+	}
+	case AttackPhase::lingeringSound: {
+		float t = static_cast<float>(attackParameter_) / 3.0f;
+		worldTransform_.scale_.z = EaseOut(1.3f, 1.0f, t);
+		worldTransform_.scale_.y = EaseOut(0.7f, 1.0f, t);
+		break;
+	}
+	}
+
+	// 規定の時間経過で攻撃終了して通常状態に戻す
+	if (attackParameter_ >= attackTime_) {
+		behaviorRequest_ = Behavior::kRoot;
+	}
+
+	// 衝突情報を初期化
+	CollisionMapInfo collisionMapInfo;
+	// 移動量に速度の値をコピー
+	collisionMapInfo.velocity = velocity_;
+	// マップ衝突チェック
+	MapCollisionDetection(collisionMapInfo);
+	// ③判定結果を反映させて移動させる
+	ActAccordingToTheOutcomeOfTheDecision(collisionMapInfo);
+	// ④天井に接触している時の処理
+	touchingTheCeiling(collisionMapInfo);
+	// ⑤壁に接触している場合の処理
+	contactWithAWall(collisionMapInfo);
+	// ⑥設置状態の切り替え
+	SwitchingInstallationStatus(collisionMapInfo);
+
+	if (turnTimer_ > 0.0f) {
+		// 旋回タイマーを1/60秒だけカウントダウンする
+		turnTimer_ -= 1.0f / 60.0f;
+		// 左右の自キャラ角度テーブル
+		float destinationRotationYTable[] = {std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float> * 3.0f / 2.0f};
+		// 状態に応じた角度を取得する
+		float destinationRotationY = destinationRotationYTable[static_cast<uint32_t>(lrDirection_)];
+		// 自キャラの角度を設定する
+		float t = 1.0f - (turnTimer_ / kTimeTurn);
+		worldTransform_.rotation_.y = Lerp(turnFirstRotationY_, destinationRotationY, t);
+	}
+
+	// アフィン変換行列の作成
+	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
+	// 行列を定数バッファに転送
+	worldTransform_.TransferMatrix();
+}
+
+void Player::BehaviorRootInitialize() {}
+
+void Player::BehaviorAttackInitialize() { 
+	attackParameter_ = 0; 
+	attackPhase_ = AttackPhase::reservoir;
+}
+
+bool Player::IsAttack() const {
+	if (behavior_ == Behavior::kAttack) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 void Player::Draw() {
@@ -86,6 +213,9 @@ AABB Player::GetAABB() {
 
 // 衝突判定
 void Player::OnCollision(const Enemy* enemy) {
+	if (IsAttack()) {
+		return;
+	}
 	(void)enemy;
 	// フラグを立てる
 	isDead_ = true;

@@ -54,7 +54,7 @@ private:
 	// フェード
 	Fade* fade_ = nullptr;
 	// フェード時間
-	static inline const int fadeTime = 3;
+	static inline const int fadeTime = 1;
 
 public:  
 	// デストラクタ  

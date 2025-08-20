@@ -3,6 +3,7 @@
 #define _USE_MATH_DEFINES
 #include <Math.h>
 #include <cmath>
+#include <algorithm>
 
 // KamataEngineの名前空間を使用
 using namespace KamataEngine;
@@ -458,3 +459,20 @@ Vector3& operator/=(Vector3& v, float s) {
 	return v;
 }
 #pragma endregion
+
+// EaseIn: 最初ゆっくり → 後半速く
+float EaseIn(float start, float end, float t) {
+	t = std::clamp(t, 0.0f, 1.0f);
+	return start + (end - start) * (t * t);
+}
+
+// EaseOut: 最初速く → 後半ゆっくり
+float EaseOut(float start, float end, float t) {
+	t = std::clamp(t, 0.0f, 1.0f);
+	return start + (end - start) * (1 - (1 - t) * (1 - t));
+}
+
+float EaseInOut(float start, float end, float t) {
+	t = std::clamp(t, 0.0f, 1.0f);
+	return static_cast<float>(start + (end - start) * (t < 0.5f ? 2 * t * t : 1 - pow(-2 * t + 2, 2) / 2));
+}

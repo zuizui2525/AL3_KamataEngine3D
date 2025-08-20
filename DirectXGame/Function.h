@@ -94,3 +94,7 @@ Vector3& operator-=(Vector3& v1, const Vector3& v2);
 Vector3& operator+=(Vector3& v1, const Vector3& v2);
 Vector3& operator/=(Vector3& v, float s);
 #pragma endregion
+
+float EaseIn(float start, float end, float t);
+float EaseOut(float start, float end, float t);
+float EaseInOut(float start, float end, float t);

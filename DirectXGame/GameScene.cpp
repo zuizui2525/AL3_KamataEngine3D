@@ -81,7 +81,7 @@ void GameScene::Initialize() {
 	modelEnemy_ = Model::CreateFromOBJ("enemy", true);
 	for (int32_t i = 0; i < 3; ++i) {
 		Enemy* newEnemy = new Enemy();
-		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(i*2 + 45, 18);
+		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(i*2 + 45, 14 + i *2);
 		newEnemy->Initialize(modelEnemy_, &camera_, enemyPosition);
 
 		enemies_.push_back(newEnemy);
@@ -116,6 +116,13 @@ void GameScene::Update() {
 		for (Enemy* enemy : enemies_) {
 			enemy->Update();
 		}
+		enemies_.remove_if([](Enemy* enemy) {
+			if (enemy->IsDead()) {
+				delete enemy;
+				return true;
+			}
+			return false;
+		});
 
 		// カメラの処理
 		if (isDebugCameraActive_) {
@@ -263,6 +270,11 @@ void GameScene::CheckAllCollisions() {
 
 	// 自キャラと敵の当たり判定
 	for (Enemy* enemy : enemies_) {
+		// 敵キャラが死んだら
+		if (enemy->IsCollisionDisabled()) {
+			continue;
+		}
+
 		// 敵キャラの座標
 		aabb2 = enemy->GetAABB();
 
