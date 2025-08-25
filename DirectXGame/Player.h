@@ -120,8 +120,6 @@ private:
 	void MapCollisionDetectionRight(CollisionMapInfo& info);
 	// 指定した角の座標を得る
 	Vector3 CornerPosition(const Vector3& center, Corner corner);
-	// 判定結果を反映して移動させる
-	void ActAccordingToTheOutcomeOfTheDecision(const CollisionMapInfo& info);
 	// 天井に接触しているときの処理
 	void touchingTheCeiling(const CollisionMapInfo& info);
 	// 設置状態の切り替え処理

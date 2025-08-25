@@ -62,8 +62,6 @@ void Player::BehaviorRootUpdate() {
 	collisionMapInfo.velocity = velocity_;
 	// マップ衝突チェック
 	MapCollisionDetection(collisionMapInfo);
-	// ③判定結果を反映させて移動させる
-	ActAccordingToTheOutcomeOfTheDecision(collisionMapInfo);
 	// ④天井に接触している時の処理
 	touchingTheCeiling(collisionMapInfo);
 	// ⑤壁に接触している場合の処理
@@ -148,8 +146,6 @@ void Player::BehaviorAttackUpdate() {
 	collisionMapInfo.velocity = velocity_;
 	// マップ衝突チェック
 	MapCollisionDetection(collisionMapInfo);
-	// ③判定結果を反映させて移動させる
-	ActAccordingToTheOutcomeOfTheDecision(collisionMapInfo);
 	// ④天井に接触している時の処理
 	touchingTheCeiling(collisionMapInfo);
 	// ⑤壁に接触している場合の処理
@@ -265,24 +261,31 @@ void Player::HandleMoveInput() {
 }
 
 void Player::MapCollisionDetection(CollisionMapInfo& info) {
-	// 水平方向の衝突判定
+	// 衝突情報を初期化
+	info.ceilingCollisionFlag = false;
+	info.landingFlag = false;
+	info.wallContactFlag = false;
+
+	// X軸の移動量のみを考慮して当たり判定を行う
 	CollisionMapInfo horizontalInfo{};
 	horizontalInfo.velocity = Vector3(info.velocity.x, 0.0f, 0.0f);
+
 	MapCollisionDetectionLeft(horizontalInfo);
 	MapCollisionDetectionRight(horizontalInfo);
 
-	// 垂直方向の衝突判定
+	// X軸の判定結果を反映
+	worldTransform_.translation_.x += horizontalInfo.velocity.x;
+	info.wallContactFlag = horizontalInfo.wallContactFlag;
+
+	// Y軸の移動量のみを考慮して当たり判定を行う
 	CollisionMapInfo verticalInfo{};
 	verticalInfo.velocity = Vector3(0.0f, info.velocity.y, 0.0f);
+
 	MapCollisionDetectionUp(verticalInfo);
 	MapCollisionDetectionDown(verticalInfo);
 
-	// 判定結果を統合
-	// 水平方向と垂直方向の速度修正を結合する
-	info.velocity = Vector3(horizontalInfo.velocity.x, verticalInfo.velocity.y, 0.0f);
-
-	// 水平方向と垂直方向の衝突フラグを結合する
-	info.wallContactFlag = horizontalInfo.wallContactFlag;
+	// Y軸の判定結果を反映
+	worldTransform_.translation_.y += verticalInfo.velocity.y;
 	info.landingFlag = verticalInfo.landingFlag;
 	info.ceilingCollisionFlag = verticalInfo.ceilingCollisionFlag;
 }
@@ -535,11 +538,6 @@ Vector3 Player::CornerPosition(const Vector3& center, Corner corner) {
         {-kWidth / 2.0f, +kHeight / 2.0f, 0}  // kLeftTop
     };
 	return center + offsetTable[static_cast<uint32_t>(corner)];
-}
-
-void Player::ActAccordingToTheOutcomeOfTheDecision(const CollisionMapInfo& info) {
-	// 移動
-	worldTransform_.translation_ += info.velocity;
 }
 
 void Player::touchingTheCeiling(const CollisionMapInfo& info) {
