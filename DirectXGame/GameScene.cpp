@@ -63,7 +63,7 @@ void GameScene::Initialize() {
 	GenerateBlocks();
 	// プレイヤー
 	// 座標をマップチップ番号で指定
-	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(30, 16);
+	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(1, 16);
 	modelPlayer_ = Model::CreateFromOBJ("PatiDigda", true);
 	player_ = new Player();
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
