@@ -107,6 +107,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CameraController.cpp" />
+    <ClCompile Include="Clear.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="DeathParticle.cpp" />
     <ClCompile Include="Enemy.cpp" />
@@ -196,6 +197,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CameraController.h" />
+    <ClInclude Include="Clear.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="DeathParticle.h" />
     <ClInclude Include="Enemy.h" />
