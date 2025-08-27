@@ -11,6 +11,7 @@ namespace {
 std::map<std::string, MapChipField::MapChipType> mapChipTable = {
     {"0", MapChipField::MapChipType::kBlank},
     {"1", MapChipField::MapChipType::kBlock},
+    {"2", MapChipField::MapChipType::kDeadBlock},
 };
 }
 

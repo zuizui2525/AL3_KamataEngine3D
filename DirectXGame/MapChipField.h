@@ -11,6 +11,7 @@ public:
 	enum class MapChipType {
 		kBlank, // 空白
 		kBlock, // ブロック
+		kDeadBlock,
 	};
 	struct MapChipData {
 		std::vector<std::vector<MapChipType>> data;

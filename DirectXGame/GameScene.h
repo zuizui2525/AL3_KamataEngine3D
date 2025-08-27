@@ -8,6 +8,7 @@
 #include "Enemy.h"
 #include "DeathParticle.h"
 #include "Fade.h"
+#include "Clear.h"
 
 // ゲームシーン  
 class GameScene {  
@@ -16,6 +17,7 @@ private:
 	uint32_t textureHandle_ = 0;  
 	// 3Dモデル  
 	KamataEngine::Model* modelBlock_;
+	KamataEngine::Model* modelDeadBlock_;
 	// 天球
 	Skydome* skydome_ = nullptr;
 	KamataEngine::Model* modelSkydome_ = nullptr;
@@ -46,6 +48,7 @@ private:
 		kPlay, // ゲームプレイ
 		kDeath, // デス演出
 		kFadeOut, // フェードアウト 
+		kClear,   // クリア演出
 	};
 	// ゲームの現在フェーズ（変数）
 	Phase phase_;
@@ -55,6 +58,13 @@ private:
 	Fade* fade_ = nullptr;
 	// フェード時間
 	static inline const int fadeTime = 1;
+	// クリアオブジェクト
+	Clear clear_;
+	KamataEngine::Model* modelClear_ = nullptr;
+	// ゴールに触れたかどうかのフラグ
+	bool isGoalHit_ = false;
+	// 即死ブロックに触れたか
+	bool touchDeadBlock_ = false;
 
 public:  
 	// デストラクタ  
