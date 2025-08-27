@@ -2,6 +2,7 @@
 #include "TitleScene.h"
 #include "KamataEngine.h"
 #include "Fade.h"
+#include "Skydome.h"
 
 // KamataEngineの名前空間を使用
 using namespace KamataEngine;
@@ -23,6 +24,14 @@ private:
 	Fade* fade_ = nullptr;
 	// フェード時間
 	static inline const int fadeTime = 1;
+	// テクスチャハンドル
+	uint32_t textureHandleTitle_ = 0;
+	Sprite* title_ = nullptr;
+	// カメラ
+	KamataEngine::Camera camera_;
+	// 天球
+	Skydome* skydome_ = nullptr;
+	KamataEngine::Model* modelSkydome_ = nullptr;
 
 public:
 	~TitleScene();

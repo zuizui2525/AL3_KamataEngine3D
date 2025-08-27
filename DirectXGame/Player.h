@@ -160,6 +160,7 @@ public :
 	void OnCollision(const Enemy* enemy);
 	// デスフラグのgetter
 	bool IsDead() const { return isDead_; };
+	void SetDead(bool flag) { isDead_ = flag; };
 	// 攻撃中
 	bool IsAttack() const;
 };

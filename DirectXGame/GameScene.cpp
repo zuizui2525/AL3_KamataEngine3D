@@ -48,14 +48,15 @@ void GameScene::Initialize() {
 	fade_->Initialize();
 	fade_->Start(Fade::Status::FadeIn, fadeTime);
 	// ファイル名を指定してテクスチャハンドルを読み込む
-	textureHandle_ = TextureManager::Load("./Resources/cube/cube.jpg");
+	textureHandle_ = TextureManager::Load("./Resources/cube/cube.png");
 	// カメラの初期化
 	camera_.Initialize();
 	// デバックカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
 	// 3Dモデルの生成
 	modelBlock_ = Model::Create();
-	modelDeadBlock_ = Model::Create();
+	modelDeadBlock_ = Model::CreateFromOBJ("deadBlock", true);
+	textureHandleDeadBlock_ = TextureManager::Load("./Resources/deadBlock/deadBlock.png");
 	// 天球の初期化
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 	skydome_ = new Skydome();
@@ -82,9 +83,9 @@ void GameScene::Initialize() {
 	cameraController_->Reset();
 	// 敵
 	modelEnemy_ = Model::CreateFromOBJ("enemy", true);
-	for (int32_t i = 0; i < 3; ++i) {
+	for (int32_t i = 0; i < 5; ++i) {
 		Enemy* newEnemy = new Enemy();
-		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(i*2 + 45, 14 + i *2);
+		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(i*2 + 90, 10 + i *2);
 		newEnemy->Initialize(modelEnemy_, &camera_, enemyPosition);
 
 		enemies_.push_back(newEnemy);
@@ -92,9 +93,9 @@ void GameScene::Initialize() {
 	// デスパーティクル
 	modelDeathParticle_ = Model::CreateFromOBJ("deathParticle", true);
 	// Clearクラスのモデルをロード
-	Model* clearModel = Model::CreateFromOBJ("cube", true);
+	Model* clearModel = Model::CreateFromOBJ("goal", true);
 	// ゴールを初期化
-	Vector3 goalPosition = mapChipField_->GetMapChipPositionByIndex(1, 13);
+	Vector3 goalPosition = mapChipField_->GetMapChipPositionByIndex(95, 13);
 	clear_.Initialize(clearModel, &camera_, goalPosition);
 
 	// ゲームプレイフェーズから開始
@@ -164,6 +165,19 @@ void GameScene::Update() {
 		}
 		// 当たり判定
 		CheckAllCollisions();
+
+		enemyTimer_++;
+		if (enemyTimer_ > 60 * 10) {
+			for (int32_t i = 0; i < 5; ++i) {
+				Enemy* newEnemy = new Enemy();
+				Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(i * 2 + 90, 10 + i * 2);
+				newEnemy->Initialize(modelEnemy_, &camera_, enemyPosition);
+
+				enemies_.push_back(newEnemy);
+			}
+			enemyTimer_ = 0;
+		}
+
 		break;
 	case Phase::kDeath:
 		// 天球
@@ -246,6 +260,8 @@ void GameScene::Update() {
 
 // 描画処理
 void GameScene::Draw() {
+	// モデル前処理
+	Model::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 	// 天球の描画
 	skydome_->Draw();
 
@@ -258,7 +274,7 @@ void GameScene::Draw() {
 			// マップチップタイプに応じてモデルを選択
 			MapChipField::IndexSet index = mapChipField_->GetMapChipIndexSetByPosition(worldTransformBlock->translation_);
 			if (mapChipField_->GetMapChipTypeByIndex(index.xIndex, index.yIndex) == MapChipField::MapChipType::kDeadBlock) {
-				modelDeadBlock_->Draw(*worldTransformBlock, camera_, textureHandle_);
+				modelDeadBlock_->Draw(*worldTransformBlock, camera_, textureHandleDeadBlock_);
 			} else {
 				modelBlock_->Draw(*worldTransformBlock, camera_, textureHandle_);
 			}
@@ -283,6 +299,9 @@ void GameScene::Draw() {
 
 	// フェード
 	fade_->Draw();
+
+	// モデル後処理
+	Model::PostDraw();
 }
 
 void GameScene::GenerateBlocks() {
@@ -443,8 +462,18 @@ void GameScene::ChargePhase() {
 		break;
 	case Phase::kDeath:
 		if (deathParticles_ && deathParticles_->GetIsFinished()) {
-			phase_ = Phase::kFadeOut;
-			fade_->Start(Fade::Status::FadeOut, fadeTime);
+			phase_ = Phase::kFadeIn;
+			fade_->Start(Fade::Status::FadeIn, fadeTime);
+			player_->SetDead(false);
+			touchDeadBlock_ = false;
+			player_->Initialize(modelPlayer_, &camera_,mapChipField_->GetMapChipPositionByIndex(1, 16));
+			for (int32_t i = 0; i < 5; ++i) {
+				Enemy* newEnemy = new Enemy();
+				Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(i * 2 + 90, 10 + i * 2);
+				newEnemy->Initialize(modelEnemy_, &camera_, enemyPosition);
+
+				enemies_.push_back(newEnemy);
+			}
 		}
 		break;
 	case Phase::kClear:

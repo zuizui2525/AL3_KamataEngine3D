@@ -64,8 +64,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		//描画開始
 		dxCommon->PreDraw();
-		// モデル前処理
-		Model::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
 		
 		///
 		/// ↓↓↓　描画処理　↓↓↓
@@ -83,8 +81,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↑↑↑　描画処理　↑↑↑
 		/// 
 		
-		// モデル後処理
-		Model::PostDraw();
 		// 描画終了
 		dxCommon->PostDraw();
 	}

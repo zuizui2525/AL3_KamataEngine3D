@@ -12,10 +12,11 @@ void Clear::Initialize(Model* model, Camera* camera, const Vector3& position) {
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
 	// ゴール用のテクスチャハンドルをロード
-	textureHandle_ = 0;
+	textureHandle_ = TextureManager::Load("./Resources/goal/goal.png");
 }
 
 void Clear::Update() {
+	worldTransform_.rotation_.y += 0.03f;
 	// ワールド変換行列を更新
 	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	worldTransform_.TransferMatrix();
