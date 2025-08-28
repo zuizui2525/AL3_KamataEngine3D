@@ -4,6 +4,9 @@
 // KamataEngineの名前空間を使用
 using namespace KamataEngine;
 
+// 度からラジアンに変換する関数
+float ConvertToRadian(float degree);
+
 #pragma region Vector3
 // ベクトルの加算を計算する関数
 Vector3 Add(const Vector3& v1, const Vector3& v2);
@@ -91,3 +94,7 @@ Vector3& operator-=(Vector3& v1, const Vector3& v2);
 Vector3& operator+=(Vector3& v1, const Vector3& v2);
 Vector3& operator/=(Vector3& v, float s);
 #pragma endregion
+
+float EaseIn(float start, float end, float t);
+float EaseOut(float start, float end, float t);
+float EaseInOut(float start, float end, float t);

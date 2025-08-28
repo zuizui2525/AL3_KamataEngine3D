@@ -5,14 +5,20 @@
 #include "MapChipField.h"
 #include "Player.h"
 #include "CameraController.h"
+#include "Enemy.h"
+#include "DeathParticle.h"
+#include "Fade.h"
+#include "Clear.h"
 
 // ゲームシーン  
 class GameScene {  
 private:  
 	// テクスチャハンドル  
 	uint32_t textureHandle_ = 0;  
+	uint32_t textureHandleDeadBlock_ = 0;
 	// 3Dモデル  
 	KamataEngine::Model* modelBlock_;
+	KamataEngine::Model* modelDeadBlock_;
 	// 天球
 	Skydome* skydome_ = nullptr;
 	KamataEngine::Model* modelSkydome_ = nullptr;
@@ -31,6 +37,40 @@ private:
 	// プレイヤー
 	Player* player_ = nullptr;
 	KamataEngine::Model* modelPlayer_ = nullptr;
+	// 敵
+	std::list<Enemy*> enemies_;
+	KamataEngine::Model* modelEnemy_ = nullptr;
+	// デスパーティクル
+	DeathParticle* deathParticles_ = nullptr;
+	KamataEngine::Model* modelDeathParticle_ = nullptr;
+	// ゲームのフェーズ（型）
+	enum class Phase {
+		kFadeIn, // フェードイン
+		kPlay, // ゲームプレイ
+		kDeath, // デス演出
+		kFadeOut, // フェードアウト 
+		kClear,   // クリア演出
+	};
+	// ゲームの現在フェーズ（変数）
+	Phase phase_;
+	// 終了フラグ
+	bool finished_ = false;
+	// フェード
+	Fade* fade_ = nullptr;
+	// フェード時間
+	static inline const int fadeTime = 1;
+	// クリアオブジェクト
+	Clear clear_;
+	KamataEngine::Model* modelClear_ = nullptr;
+	// ゴールに触れたかどうかのフラグ
+	bool isGoalHit_ = false;
+	// 即死ブロックに触れたか
+	bool touchDeadBlock_ = false;
+	// enemytimer
+	uint32_t enemyTimer_ = 0;
+	// テクスチャハンドル
+	uint32_t textureHandleHUD_ = 0;
+	Sprite* HUD_ = nullptr;
 
 public:  
 	// デストラクタ  
@@ -43,4 +83,10 @@ public:
 	void Draw();  
 	// 表示ブロックの生成
 	void GenerateBlocks();
+	// 全ての当たり判定を行う
+	void CheckAllCollisions();
+	// フェーズの切り替え
+	void ChargePhase();
+	// 終了フラグのgetter
+	bool GetFinished() const { return finished_; };
 };
