@@ -25,7 +25,7 @@ void DrawScene();
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	//エンジンの初期化
-	KamataEngine::Initialize(L"LE2B_03_イトウ_カズイ_AL3");
+	KamataEngine::Initialize(L"LE2B_03_イトウ_カズイ_方向ロック");
 	
 	scene = Scene::kTitle;
 	titleScene = new TitleScene();

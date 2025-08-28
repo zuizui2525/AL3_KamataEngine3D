@@ -100,6 +100,10 @@ void GameScene::Initialize() {
 
 	// ゲームプレイフェーズから開始
 	phase_ = Phase::kFadeIn;
+
+	// HUD
+	textureHandleHUD_ = TextureManager::Load("./Resources/gameHUD.png");
+	HUD_ = Sprite::Create(textureHandleHUD_, {0, 0});
 }
 
 // ゲームの更新処理
@@ -110,7 +114,7 @@ void GameScene::Update() {
 	switch (phase_) {
 	case Phase::kPlay:
 #ifdef _DEBUG
-		if (Input::GetInstance()->TriggerKey(DIK_R)) {
+		if (Input::GetInstance()->TriggerKey(DIK_ESCAPE)) {
 			if (isDebugCameraActive_ == true) {
 				isDebugCameraActive_ = false;
 			} else {
@@ -302,6 +306,13 @@ void GameScene::Draw() {
 
 	// モデル後処理
 	Model::PostDraw();
+
+	// スプライト前処理
+	Sprite::PreDraw(DirectXCommon::GetInstance()->GetCommandList());
+	// title
+	HUD_->Draw();
+	// スプライト後処理
+	Sprite::PostDraw();
 }
 
 void GameScene::GenerateBlocks() {
@@ -388,7 +399,7 @@ void GameScene::ChargePhase() {
 		}
 
 #ifdef _DEBUG
-		if (Input::GetInstance()->TriggerKey(DIK_R)) {
+		if (Input::GetInstance()->TriggerKey(DIK_ESCAPE)) {
 			if (isDebugCameraActive_ == true) {
 				isDebugCameraActive_ = false;
 			} else {
@@ -445,7 +456,7 @@ void GameScene::ChargePhase() {
 			deathParticles_->Initialize(modelDeathParticle_, &camera_, deathParticlesPosition);
 		}
 		// ゴールに触れたらクリア演出へ移行
-		if (isGoalHit_) {
+		if (isGoalHit_ || Input::GetInstance()->IsTriggerMouse(1)) {
 			phase_ = Phase::kClear;
 		}
 		// デスブロックに触れたら
@@ -467,13 +478,6 @@ void GameScene::ChargePhase() {
 			player_->SetDead(false);
 			touchDeadBlock_ = false;
 			player_->Initialize(modelPlayer_, &camera_,mapChipField_->GetMapChipPositionByIndex(1, 16));
-			for (int32_t i = 0; i < 5; ++i) {
-				Enemy* newEnemy = new Enemy();
-				Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(i * 2 + 90, 10 + i * 2);
-				newEnemy->Initialize(modelEnemy_, &camera_, enemyPosition);
-
-				enemies_.push_back(newEnemy);
-			}
 		}
 		break;
 	case Phase::kClear:

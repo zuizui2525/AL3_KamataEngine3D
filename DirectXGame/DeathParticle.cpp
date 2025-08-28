@@ -3,9 +3,6 @@
 #include <algorithm>
 
 void DeathParticle::Initialize(Model* model, Camera* camera, const Vector3& position) {
-	// NULLポインタチェック
-	assert(model);
-	assert(camera);
 	// データをモデルに代入
 	model_ = model;
 	// データをカメラに代入

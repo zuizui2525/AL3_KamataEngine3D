@@ -8,7 +8,6 @@ using namespace KamataEngine;
 void CameraController::Initialize() {
 	// カメラの初期化
 	camera_->Initialize();
-
 }
 
 void CameraController::Update() {

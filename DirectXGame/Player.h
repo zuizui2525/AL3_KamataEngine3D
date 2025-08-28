@@ -63,7 +63,7 @@ private:
 	// 速度
 	Vector3 velocity_ = {};
 	// 固定の加速度
-	static inline const float kAcceleration = 0.2f;
+	static inline const float kAcceleration = 0.9f;
 	// 固定の減衰抵抗力
 	static inline const float kAttenuation = 0.08f;
 	// 最大速度制限
@@ -81,9 +81,9 @@ private:
 	// 重力加速度(下方向)
 	static inline const float kGravityAccleration = 9.8f / 60.0f;
 	// 最大落下速度(下方向)
-	static inline const float kLimitFallSpeed = 0.8f;
+	static inline const float kLimitFallSpeed = 0.5f;
 	// ジャンプ初速(上方向)
-	static inline const float kJumpAcceleration = 1.8f;
+	static inline const float kJumpAcceleration = 1.5f;
 	// 接地フラグ
 	bool landing = false;
 	// マップチップによるフィールド

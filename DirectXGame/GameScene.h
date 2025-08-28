@@ -68,6 +68,9 @@ private:
 	bool touchDeadBlock_ = false;
 	// enemytimer
 	uint32_t enemyTimer_ = 0;
+	// テクスチャハンドル
+	uint32_t textureHandleHUD_ = 0;
+	Sprite* HUD_ = nullptr;
 
 public:  
 	// デストラクタ  

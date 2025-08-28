@@ -5,9 +5,6 @@
 #include <algorithm>
 
 void Enemy::Initialize(Model* model, Camera* camera, const Vector3& position) {
-	// NULLポインタチェック
-	assert(model);
-	assert(camera);
 	// ファイル名を指定してテクスチャハンドルを読み込む
 	textureHandle_ = TextureManager::Load("./Resources/enemy/enemyColor.png");
 	// データをモデルに代入

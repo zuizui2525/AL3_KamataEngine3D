@@ -8,9 +8,6 @@
 DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 
 void Player::Initialize(Model* model, Camera* camera, const Vector3& position) {
-	// NULLポインタチェック
-	assert(model);
-	assert(camera);
 	// ファイル名を指定してテクスチャハンドルを読み込む
 	textureHandle_ = TextureManager::Load("./Resources/PatiDigda/PatiDigda.png");
 	// データをモデルに代入
@@ -81,7 +78,7 @@ void Player::BehaviorRootUpdate() {
 		worldTransform_.rotation_.y = Lerp(turnFirstRotationY_, destinationRotationY, t);
 	}
 
-	if (Input::GetInstance()->TriggerKey(DIK_E)) {
+	if (Input::GetInstance()->IsTriggerMouse(0)) {
 		// 攻撃ビヘイビアをリクエスト
 		behaviorRequest_ = Behavior::kAttack;
 	}
@@ -220,9 +217,9 @@ void Player::OnCollision(const Enemy* enemy) {
 void Player::HandleMoveInput() {
 	if (onGround_) {
 		// 設置状態時の移動入力処理
-		if (Input::GetInstance()->PushKey(DIK_RIGHT) || Input::GetInstance()->PushKey(DIK_LEFT)) {
+		if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A)) {
 			Vector3 acceleration = {};
-			if (Input::GetInstance()->PushKey(DIK_RIGHT)) {
+			if (Input::GetInstance()->PushKey(DIK_D)) {
 				if (velocity_.x < 0.0f) {
 					velocity_.x *= (1.0f - kAttenuation);
 				}
@@ -232,7 +229,7 @@ void Player::HandleMoveInput() {
 					turnFirstRotationY_ = worldTransform_.rotation_.y;
 					turnTimer_ = kTimeTurn;
 				}
-			} else if (Input::GetInstance()->PushKey(DIK_LEFT)) {
+			} else if (Input::GetInstance()->PushKey(DIK_A)) {
 				if (velocity_.x > 0.0f) {
 					velocity_.x *= (1.0f - kAttenuation);
 				}
@@ -249,7 +246,7 @@ void Player::HandleMoveInput() {
 			velocity_.x *= (1.0f - kAttenuation);
 		}
 
-		if (Input::GetInstance()->PushKey(DIK_UP)) {
+		if (Input::GetInstance()->PushKey(DIK_SPACE)) {
 			velocity_ += Vector3(0, kJumpAcceleration, 0);
 		}
 	} else {
